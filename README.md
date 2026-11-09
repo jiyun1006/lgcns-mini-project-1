@@ -14,8 +14,8 @@
 ## 시작하기
 
 ```bash
-git clone <레포 주소>
-cd mini-project-1
+git clone https://github.com/jiyun1006/lgcns-mini-project-1.git
+cd lgcns-mini-project-1
 npm install
 cp .env.example .env    # 실제 값은 팀 채널에서 받아서 채우기
 npm run dev
@@ -152,7 +152,7 @@ z-index가 모달보다 낮아서 스크롤 시 헤더가 가려지던 문제.
 ## 폴더 구조
 
 ```
-mini-project-1/
+lgcns-mini-project-1/
 ├── app/              ← 라우트 (page, layout)
 ├── components/
 │   ├── common/       ← 공용 컴포넌트 (수정 시 담당자와 상의)
