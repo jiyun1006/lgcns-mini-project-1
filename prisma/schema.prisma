@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────
+// 🔐 회원 (인증 방식 확정 후 필드 추가 가능)
+// ─────────────────────────────
+model User {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  email         String         @unique
+  name          String
+  password      String?        // 소셜 로그인 유저는 비밀번호 없음
+  createdAt     DateTime       @default(now())
+
+  conversations Conversation[]
+  posts         Post[]
+  comments      Comment[]
+  postLikes     PostLike[]
+}
+
+// ─────────────────────────────
+// 💬 AI 채팅 (확정)
+// ─────────────────────────────
+model Conversation {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String    @default("새 대화")
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId, updatedAt]) // 내 대화방 목록 최근순
+}
+
+model Message {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  role           Role
+  content        String
+  reasoning      String?      // EXAONE 추론 내용 (디버깅용, 화면에 표시 안 함)
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt]) // 대화방 메시지 시간순
+}
+
+enum Role {
+  USER
+  ASSISTANT
+}
+
+// ─────────────────────────────
+// 📝 게시판 (초안 - 게시판 팀 확정 후 수정)
+// ─────────────────────────────
+model Post {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  viewCount Int        @default(0)
+  authorId  String     @db.ObjectId
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  likes     PostLike[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([createdAt]) // 최신순 목록
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String   @db.ObjectId
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([postId, createdAt]) // 게시글 댓글 시간순
+}
+
+model PostLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId]) // 한 사람이 한 글에 좋아요 한 번만
+}
