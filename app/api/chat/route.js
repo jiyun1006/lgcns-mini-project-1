@@ -80,12 +80,16 @@ export async function POST(req) {
           messages: {
             $each: [
               {
+                id: crypto.randomUUID(),
                 role: "USER",
                 content: question.trim(),
+                createdAt: now.toISOString(),
               },
               {
+                id: crypto.randomUUID(),
                 role: "ASSISTANT",
                 content: answer,
+                createdAt: new Date().toISOString(),
               },
             ],
           },

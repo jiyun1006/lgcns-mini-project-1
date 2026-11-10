@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ChatMessage } from "@/types/chat";
 
 const questions = [
   "인공지능이란 무엇인지 쉽게 설명해줘.",
@@ -9,15 +10,10 @@ const questions = [
   "머신러닝과 딥러닝의 차이점을 예시와 함께 설명해줘.",
 ];
 
-type Message = {
-  role: "USER" | "ASSISTANT";
-  content: string;
-};
-
 type Conversation = {
   _id: string;
   title: string;
-  messages?: Message[];
+  messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
 };
@@ -26,7 +22,7 @@ export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -195,8 +191,18 @@ export default function Home() {
 
       setMessages((prev) => [
         ...prev,
-        { role: "USER", content: text.trim() },
-        { role: "ASSISTANT", content: data.answer },
+        {
+          id: crypto.randomUUID(),
+          role: "USER",
+          content: text.trim(),
+          createdAt: now,
+        },
+        {
+          id: crypto.randomUUID(),
+          role: "ASSISTANT",
+          content: data.answer,
+          createdAt: new Date().toISOString(),
+        },
       ]);
 
       setQuestion("");
@@ -414,7 +420,7 @@ export default function Home() {
                 key={i}
                 style={{
                   display: "flex",
-                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                  justifyContent: msg.role === "USER" ? "flex-end" : "flex-start",
                   marginBottom: "20px",
                 }}
               >
@@ -423,13 +429,13 @@ export default function Home() {
                     maxWidth: "75%",
                     padding: "15px",
                     borderRadius: "12px",
-                    background: msg.role === "user" ? "#dce8ff" : "#f1f1f1",
+                    background: msg.role === "USER" ? "#dce8ff" : "#f1f1f1",
                     whiteSpace: "pre-wrap",
                     lineHeight: "1.6",
                     overflowWrap: "anywhere",
                   }}
                 >
-                  <strong>{msg.role === "user" ? "나" : "EXAONE"}</strong>
+                  <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
                   <p style={{ marginBottom: 0 }}>{msg.content}</p>
                 </div>
               </div>
