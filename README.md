@@ -1,7 +1,7 @@
 # 미니프로젝트1
 
 > LG CNS AM Inspire Camp 7기 미니프로젝트 (8명 · 4일)
-> 주제: _(Day 1에 정해지면 업데이트)_
+> **K-EXAONE 2.5를 활용한 AI 채팅 서비스**
 
 ## 기술 스택
 
@@ -9,29 +9,77 @@
 | --- | --- |
 | Framework | Next.js (App Router), TypeScript |
 | Style | Tailwind CSS, shadcn/ui |
+| DB | MongoDB Atlas + Prisma 6 |
+| Auth | NextAuth |
+| AI | K-EXAONE 2.5 (EXAONE API) |
 | 협업 | GitHub Issues, Projects(Kanban), ESLint, Prettier, husky + lint-staged |
 
 ## 시작하기
 
 ```bash
-git clone https://github.com/jiyun1006/lgcns-mini-project-1.git
+git clone https://github.com/lgcns-mjp1-team/lgcns-mini-project-1.git
 cd lgcns-mini-project-1
 npm install
 cp .env.example .env    # 실제 값은 팀 채널에서 받아서 채우기
+npx prisma generate
 npm run dev
 ```
 
 - 프로젝트를 열면 뜨는 **추천 확장(Prettier, ESLint) 설치** 알림에서 Install을 눌러주세요.
 - 저장하면 자동으로 포맷되고, 커밋할 때 lint-staged가 한 번 더 검사합니다.
+- **스키마가 바뀌었다는 공지를 받으면:** `git pull` → `npx prisma generate`
+
+### 환경변수 (`.env`)
+
+| 키 | 설명 |
+| --- | --- |
+| `DATABASE_URL` | MongoDB Atlas 연결 주소 (DB 이름 `mjp1` 포함) |
+| `EXAONE_API_KEY` | EXAONE API 키 (**서버 코드에서만 사용, 브라우저 노출 금지**) |
+
+> 실제 값은 절대 커밋하지 마세요. 키를 추가하면 `.env.example`에도 키 이름을 추가해주세요.
+
+## 서비스 구조
+
+```
+[브라우저] 채팅 입력
+    ↓
+[Next 서버] ① 질문 저장 → ② 이전 대화 조회 → ③ EXAONE API 호출
+    ↓
+[Next 서버] ④ 답변 받기 → ⑤ 답변 저장
+    ↓
+[브라우저] 답변 표시
+```
+
+### 데이터 모델
+
+```
+User ──< Conversation ──< Message
+                          (role: USER / ASSISTANT)
+```
+
+| 모델 | 설명 |
+| --- | --- |
+| User | 사용자 |
+| Conversation | 대화방 (사이드바 목록 하나) |
+| Message | 말풍선 하나 (질문 또는 AI 답변) |
+
+## 파트 구성
+
+| 파트 | 담당 범위 |
+| --- | --- |
+| 🅰 인증·레이아웃 | 회원가입, 로그인, 보호 페이지, 공통 레이아웃 |
+| 🅱 채팅 UI | 메시지 목록, 입력창, 로딩·에러, 마크다운 렌더링 |
+| 🅲 채팅 API·AI | 메시지 전송 API, EXAONE 연동, 권한 체크, 에러 처리 |
+| 🅳 대화방 관리 | 대화방 목록, `/chat/[conversationId]`, 새 대화, 이름 변경·삭제 |
 
 ## 브랜치 전략
 
 ```
 main        ← 발표·배포용 (직접 push 금지)
  └ develop  ← 기본 브랜치, PR로만 머지
-    ├ feat/12-login-form
-    ├ fix/15-header-overlap
-    └ refactor/20-api-client
+    ├ feat/12-chat-api
+    ├ fix/15-scroll-bug
+    └ refactor/20-message-list
 ```
 
 - 브랜치 이름: `타입/이슈번호-설명`
@@ -40,9 +88,9 @@ main        ← 발표·배포용 (직접 push 금지)
 ```bash
 git checkout develop
 git pull
-git checkout -b feat/12-login-form
+git checkout -b feat/12-chat-api
 # 작업 후
-git push -u origin feat/12-login-form
+git push -u origin feat/12-chat-api
 ```
 
 ## 작업 흐름
@@ -120,25 +168,22 @@ closes #
 
 - PR은 작게 나눠서 올려주세요.
 - 충돌은 PR을 올린 사람이 `git pull origin develop`으로 해결합니다.
-- 리뷰 요청을 받으면 가능한 빨리 확인해주세요.
+- `closes #번호`는 develop에 머지될 때 이슈를 자동으로 닫아요. 일부만 끝낸 PR에는 `refs #번호`를 써주세요.
 
 ## 커밋 메시지
 
 **제목 한 줄은 필수, 본문은 "왜 이렇게 했는지" 설명이 필요할 때만** 씁니다.
 
 ```
-feat: 로그인 폼 유효성 검사 추가 (#12)
+feat: 메시지 전송 API 추가 (#12)
 ```
 
 ```
-fix: 모바일 헤더 겹침 수정 (#15)
+fix: 새 메시지 수신 시 스크롤이 안 내려가는 문제 수정 (#15)
 
-z-index가 모달보다 낮아서 스크롤 시 헤더가 가려지던 문제.
-헤더를 sticky로 바꾸고 z-index를 50으로 올림.
+메시지 목록이 렌더링되기 전에 스크롤 이동이 실행되던 문제.
+useEffect 의존성에 messages를 추가해서 렌더링 후 이동하도록 변경.
 ```
-
-- 제목은 `타입: 내용 (#이슈번호)`, 50자 이내, 마침표 없이
-- 본문은 제목과 한 줄 띄우고 작성 (`git commit`만 치면 에디터가 열려서 여러 줄을 쓸 수 있어요)
 
 | 타입 | 의미 |
 | --- | --- |
@@ -149,26 +194,39 @@ z-index가 모달보다 낮아서 스크롤 시 헤더가 가려지던 문제.
 | docs | 문서 수정 |
 | chore | 설정, 패키지 등 기타 |
 
+- 제목은 `타입: 내용 (#이슈번호)`, 50자 이내, 마침표 없이
+- 본문은 제목과 한 줄 띄우고 작성 (`git commit`만 치면 에디터가 열려서 여러 줄을 쓸 수 있어요)
+
 ## 폴더 구조
 
 ```
 lgcns-mini-project-1/
-├── app/              ← 라우트 (page, layout)
+├── app/
+│   ├── (auth)/           ← login, signup
+│   ├── chat/
+│   │   └── [conversationId]/
+│   └── api/chat/         ← 메시지 전송 API
 ├── components/
-│   ├── common/       ← 공용 컴포넌트 (수정 시 담당자와 상의)
-│   └── [기능명]/      ← 기능별 컴포넌트
+│   ├── common/           ← 공용 컴포넌트 (수정 시 담당자와 상의)
+│   └── chat/             ← 채팅 관련 컴포넌트
 ├── hooks/
-├── lib/              ← API 클라이언트, 유틸
+├── lib/
+│   ├── prisma.ts         ← PrismaClient (여기서만 생성)
+│   └── ai.ts             ← EXAONE API 호출
+├── prisma/
+│   └── schema.prisma     ← DB 담당자만 수정
 └── types/
 ```
 
 ## 팀 규칙
 
-- **패키지 설치는 공유 후** 진행해주세요. `package-lock.json`은 꼭 같이 커밋합니다.
-- 환경변수를 추가하면 `.env.example`에도 키 이름을 추가해주세요. (값은 절대 커밋 금지)
+- **스키마 수정과 `prisma db push`는 DB 담당자만** 합니다. 필요한 필드가 있으면 이슈나 채널로 요청해주세요.
+- **DB 접근은 `lib/prisma.ts`의 `prisma`만** import해서 사용합니다. (`new PrismaClient()` 직접 생성 금지)
+- **EXAONE 호출은 `lib/ai.ts`를 통해서만** 합니다. API 키가 브라우저 코드에 들어가지 않게 주의해주세요.
+- **패키지 설치는 공유 후** 진행해주세요. 버전을 명시해서 설치하고 `package-lock.json`은 꼭 같이 커밋합니다.
 
 ## 팀원
 
-| 이름 | GitHub | 담당 |
+| 이름 | GitHub | 파트 |
 | --- | --- | --- |
 |  |  |  |
