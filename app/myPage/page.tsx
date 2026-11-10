@@ -1,0 +1,35 @@
+import RenderProfileLinkSection from "@/components/templates/RenderProfileLinkSection";
+
+export default function myPage() {
+  return (
+    <main>
+      {/*section 내 프로필 기본 정보 
+    이름, 프사, 사진 변경 반으로 쪼개 왼쪽으로 보기  오른쪽은 닉네임, 이메일
+    외부 프로필 링크 URL 입력 추가 버튼 추가되면 direction할 수 있도록
+    */}
+      {/* section
+    관심사 자기 한마디 내용 저장 왼쪽 칸
+    관심사 작성 (텍스트 75자 미만)
+    자기 한마디 작성 (텍스트 150자 미만)
+
+    자기 정보 비공개 기능 오른쪽 칸
+    토글로 껐다 키기
+    이메일 및 외부 링크 공개 여부 체크박스
+    관심사 및 자기 한마디 공개 여부 체크박스
+    */}
+      {/* section
+    비밀번호 변경 및 연결 계정 
+    비밀번호 변경 버튼 -> 클릭 시 hidden input 창 뜨면서 비밀번호 변경 가능 현재 비밀번호, 새 비밀번호, 새 비밀번호 확인 
+
+    연결된 소셜 계정 관리
+    카카오, 구글 뭘로 연결되어있는지 확인만
+    */}
+      {/* 
+    로그아웃, 회원탈퇴 버튼     
+    */}
+      <section>
+        <RenderProfileLinkSection />
+      </section>
+    </main>
+  );
+}
