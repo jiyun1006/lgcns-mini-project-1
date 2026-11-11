@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import BoardProvider from "@/components/board/BoardProvider";
+import AuthShell from "@/components/providers/AuthShell";
 import "./globals.css";
 import "./posts/board.css";
 
@@ -23,7 +25,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <BoardProvider>{children}</BoardProvider>
+        <Suspense fallback={null}>
+          <AuthShell>
+            <BoardProvider>{children}</BoardProvider>
+          </AuthShell>
+        </Suspense>
       </body>
     </html>
   );
