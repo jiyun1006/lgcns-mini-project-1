@@ -123,23 +123,56 @@ export default function ChatPage() {
     setLoading(true);
     setError("");
 
+    // 화면에 먼저 보여줄 임시 메시지 2개
+    const now = new Date().toISOString();
+    const userMsg: ChatMessage = {
+      id: `temp-user-${Date.now()}`,
+      role: "USER",
+      content: text.trim(),
+      createdAt: now,
+    };
+    const aiMsg: ChatMessage = {
+      id: `temp-ai-${Date.now()}`,
+      role: "ASSISTANT",
+      content: "",
+      createdAt: now,
+    };
+
     try {
       let conversationId = activeId;
       if (!conversationId) conversationId = await createConversation();
+
+      setMessages((prev) => [...prev, userMsg, aiMsg]);
+      setQuestion("");
 
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: text.trim(), conversationId }),
       });
-      const data = await response.json();
 
-      if (!response.ok) throw new Error(data.error || "답변 생성 실패");
+      // 스트림 시작 전 에러는 JSON으로 옴
+      if (!response.ok || !response.body) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "답변 생성 실패");
+      }
 
-      setMessages((prev) => [...prev, ...(data.messages as ChatMessage[])]);
-      setQuestion("");
-      await loadConversations();
+      // 조각이 올 때마다 AI 메시지에 이어 붙이기
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        setMessages((prev) =>
+          prev.map((m) => (m.id === aiMsg.id ? { ...m, content: m.content + chunk } : m)),
+        );
+      }
+
+      await loadConversations(); // 사이드바 제목, 순서 갱신
     } catch (err) {
+      // 실패하면 빈 AI 말풍선 제거
+      setMessages((prev) => prev.filter((m) => m.id !== aiMsg.id));
       setError(err instanceof Error ? err.message : "오류 발생");
     } finally {
       setLoading(false);
