@@ -38,7 +38,7 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
 
     // 1) 빈칸 검사 (로그인은 형식 검사를 깊게 안 해요. 틀리면 서버가 알려 줘요)
     const nextErrors: LoginErrors = {
-      email: values.email.trim() ? "" : "이메일을 입력해 주세요.",
+      email: values.email.trim() ? "" : "아이디 또는 이메일을 입력해 주세요.",
       password: values.password ? "" : "비밀번호를 입력해 주세요.",
     };
     setErrors(nextErrors);
@@ -81,10 +81,10 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
       <TextField
         id="email"
         name="email"
-        type="email"
-        label="이메일"
-        autoComplete="email"
-        placeholder="example@email.com"
+        type="text"
+        label="아이디 또는 이메일"
+        autoComplete="username"
+        placeholder="아이디 또는 example@email.com"
         value={values.email}
         onChange={handleChange}
         onClear={() => setValues((prev) => ({ ...prev, email: "" }))}
@@ -111,7 +111,7 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
             onChange={(e) => setIsRemembered(e.target.checked)}
             className="h-[18px] w-[18px] accent-[#4338CA]"
           />
-          이메일 기억하기
+          아이디 기억하기
         </label>
         <span className="flex gap-1.5 text-[#52525B]">
           <Link href="/find-id">아이디 찾기</Link>

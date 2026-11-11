@@ -16,3 +16,14 @@ export async function makeLoginId(email: string) {
     if (!taken) return loginId;
   }
 }
+
+// 로그인 칸 글자 → Spring에 보낼 가입 이메일. @가 있으면 그대로, 없으면 아이디로 찾기
+export async function toLoginEmail(input: string) {
+  const value = input.trim().toLowerCase();
+  if (value.includes("@")) return value;
+  const user = await prisma.user.findFirst({
+    where: { loginId: value },
+    select: { email: true },
+  });
+  return user?.email ?? null;
+}

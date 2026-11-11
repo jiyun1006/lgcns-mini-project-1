@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import { EXPIRES_IN_SECONDS, signAccessToken } from "@/lib/accessJwt";
 import { springAuthLogin } from "@/service/spring/springAuthService";
-import { makeLoginId } from "@/lib/loginId";
+import { makeLoginId, toLoginEmail } from "@/lib/loginId";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -20,10 +20,10 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const result = await springAuthLogin(
-          credentials.email.trim().toLowerCase(),
-          credentials.password,
-        );
+        const loginEmail = await toLoginEmail(credentials.email);
+        if (!loginEmail) throw new Error("이메일 또는 비밀번호가 올바르지 않습니다.");
+        const result = await springAuthLogin(loginEmail, credentials.password);
+
         if (!result.ok) throw new Error(result.message);
         const data = result.data;
 
