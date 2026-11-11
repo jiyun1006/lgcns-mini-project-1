@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma 6 + MongoDB
+// Source: lgcns-mjp1-team/lgcns-mini-project-1 (develop)
+// Keep the account and chat models compatible with the existing project.
 
 generator client {
   provider = "prisma-client-js"
@@ -13,15 +11,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─────────────────────────────
-// 🔐 회원 (인증 방식 확정 후 필드 추가 가능)
-// ─────────────────────────────
+// 회원
 model User {
   id            String         @id @default(auto()) @map("_id") @db.ObjectId
   email         String         @unique
   name          String
-  password      String?        // 소셜 로그인 유저는 비밀번호 없음
-  interests     String[]       @default([]) // 관심사 태그 (강사님 API는 안 받아서 우리 Mongo에)
+  password      String?
+  interests     String[]       @default([])
   createdAt     DateTime       @default(now())
 
   conversations Conversation[]
@@ -30,9 +26,7 @@ model User {
   postLikes     PostLike[]
 }
 
-// ─────────────────────────────
-// 💬 AI 채팅 (확정)
-// ─────────────────────────────
+// AI 채팅: 기존 모델 유지
 model Conversation {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   title     String    @default("새 대화")
@@ -42,19 +36,19 @@ model Conversation {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  @@index([userId, updatedAt]) // 내 대화방 목록 최근순
+  @@index([userId, updatedAt])
 }
 
 model Message {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   role           Role
   content        String
-  reasoning      String?      // EXAONE 추론 내용 (디버깅용, 화면에 표시 안 함)
+  reasoning      String?
   conversationId String       @db.ObjectId
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   createdAt      DateTime     @default(now())
 
-  @@index([conversationId, createdAt]) // 대화방 메시지 시간순
+  @@index([conversationId, createdAt])
 }
 
 enum Role {
@@ -62,9 +56,7 @@ enum Role {
   ASSISTANT
 }
 
-// ─────────────────────────────
-// 📝 게시판 (초안 - 게시판 팀 확정 후 수정)
-// ─────────────────────────────
+// 게시글
 model Post {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   title     String

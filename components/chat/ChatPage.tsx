@@ -203,7 +203,7 @@ export default function ChatPage() {
       style={{
         display: "flex",
         width: "100%",
-        height: "100dvh",
+        height: "100d%",
         overflow: "hidden",
         fontFamily: "Arial, sans-serif",
         color: "#222",
