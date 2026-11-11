@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ChatMessage } from "@/types/chat";
+import type { ChatMessage, Conversation } from "@/types/chat";
 
 const questions = [
   "인공지능이란 무엇인지 쉽게 설명해줘.",
@@ -9,14 +9,6 @@ const questions = [
   "운영체제에서 프로세스와 스레드의 차이는 무엇인가?",
   "머신러닝과 딥러닝의 차이점을 예시와 함께 설명해줘.",
 ];
-
-type Conversation = {
-  _id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: string;
-  updatedAt: string;
-};
 
 export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -52,7 +44,7 @@ export default function Home() {
 
     const data = await response.json();
 
-    setActiveId(data._id);
+    setActiveId(data.id);
     setMessages(data.messages || []);
   };
 
@@ -69,11 +61,11 @@ export default function Home() {
     const data = await response.json();
 
     setConversations((prev) => [data, ...prev]);
-    setActiveId(data._id);
+    setActiveId(data.id);
     setMessages([]);
     setError("");
 
-    return data._id as string;
+    return data.id as string;
   };
 
   // 대화 이름 수정
@@ -111,7 +103,7 @@ export default function Home() {
       }
 
       setConversations((prev) =>
-        prev.map((item) => (item._id === id ? { ...item, title: data.title } : item)),
+        prev.map((item) => (item.id === id ? { ...item, title: data.title } : item)),
       );
     } catch (err) {
       alert(err instanceof Error ? err.message : "이름 수정 실패");
@@ -138,7 +130,7 @@ export default function Home() {
       }
 
       // 대화 목록에서 제거
-      const remaining = conversations.filter((item) => item._id !== id);
+      const remaining = conversations.filter((item) => item.id !== id);
 
       setConversations(remaining);
 
@@ -149,7 +141,7 @@ export default function Home() {
 
         // 남아 있는 대화가 있다면 첫 번째 대화 선택
         if (remaining.length > 0) {
-          await selectConversation(remaining[0]._id);
+          await selectConversation(remaining[0].id);
         }
       }
     } catch (err) {
@@ -189,21 +181,8 @@ export default function Home() {
         throw new Error(data.error || "답변 생성 실패");
       }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          role: "USER",
-          content: text.trim(),
-          createdAt: now,
-        },
-        {
-          id: crypto.randomUUID(),
-          role: "ASSISTANT",
-          content: data.answer,
-          createdAt: new Date().toISOString(),
-        },
-      ]);
+      // 서버가 저장한 질문 + 답변을 그대로 붙임
+      setMessages((prev) => [...prev, ...(data.messages as ChatMessage[])]);
 
       setQuestion("");
 
@@ -222,7 +201,7 @@ export default function Home() {
         const data = await loadConversations();
 
         if (data.length > 0) {
-          await selectConversation(data[0]._id);
+          await selectConversation(data[0].id);
         }
       } catch {
         setError("서버에 연결할 수 없습니다.");
@@ -282,18 +261,18 @@ export default function Home() {
         >
           {conversations.map((item) => (
             <div
-              key={item._id}
+              key={item.id}
               style={{
                 display: "flex",
                 alignItems: "center",
                 marginBottom: "5px",
                 borderRadius: "7px",
-                background: activeId === item._id ? "#dce3ec" : "transparent",
+                background: activeId === item.id ? "#dce3ec" : "transparent",
               }}
             >
               {/* 대화 선택 버튼 */}
               <button
-                onClick={() => selectConversation(item._id)}
+                onClick={() => selectConversation(item.id)}
                 style={{
                   flex: 1,
                   minWidth: 0,
@@ -322,7 +301,7 @@ export default function Home() {
 
               {/* 이름 수정 버튼 */}
               <button
-                onClick={() => renameConversation(item._id, item.title)}
+                onClick={() => renameConversation(item.id, item.title)}
                 title="대화 이름 수정"
                 style={{
                   padding: "8px",
@@ -337,7 +316,7 @@ export default function Home() {
 
               {/* 삭제 버튼 */}
               <button
-                onClick={() => deleteConversation(item._id)}
+                onClick={() => deleteConversation(item.id)}
                 title="대화 삭제"
                 style={{
                   padding: "8px",
@@ -374,7 +353,7 @@ export default function Home() {
           }}
         >
           <h3 style={{ margin: 0 }}>
-            {conversations.find((c) => c._id === activeId)?.title || "새 대화"}
+            {conversations.find((c) => c.id === activeId)?.title || "새 대화"}
           </h3>
         </header>
 
