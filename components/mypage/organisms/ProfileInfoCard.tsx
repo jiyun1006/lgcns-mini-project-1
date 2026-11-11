@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import AvatarUploader from "@/components/mypage/molecules/AvatarUploader";
 import FormField from "@/components/mypage/molecules/FormField";
 import type { MyPageUser } from "@/types/mypage";
 
@@ -72,6 +73,7 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
           </CardAction>
         </CardHeader>
         <CardContent className="grid gap-4">
+          <AvatarUploader initialSrc={profile.profileImageUrl} name={profile.nickname} />
           {fields.map(({ key, label, type }) =>
             isEditing ? (
               <FormField
