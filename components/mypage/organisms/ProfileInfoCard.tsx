@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Pencil, Save, User } from "lucide-react";
+import { Pencil, Save, User, X } from "lucide-react";
 import { MyPageButton } from "@/components/mypage/atoms/MyPageButton";
 import {
   Card,
@@ -30,6 +30,11 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
   const startEditing = () => {
     setDraft(profile);
     setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setError(null);
+    setIsEditing(false);
   };
 
   // shortcut: 로컬 state에만 저장함, 프로필 수정 API가 생기면 여기서 호출
@@ -61,12 +66,18 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
             내 프로필 및 기본 정보
           </CardTitle>
           <CardDescription>프로필 사진, 닉네임, 아이디, 이메일을 관리합니다</CardDescription>
-          <CardAction>
+          <CardAction className="flex gap-2">
             {isEditing ? (
-              <MyPageButton key="save" type="submit">
-                <Save />
-                저장
-              </MyPageButton>
+              <>
+                <MyPageButton key="cancel" type="button" variant="outline" onClick={cancelEditing}>
+                  <X />
+                  취소
+                </MyPageButton>
+                <MyPageButton key="save" type="submit">
+                  <Save />
+                  저장
+                </MyPageButton>
+              </>
             ) : (
               <MyPageButton key="edit" type="button" onClick={startEditing}>
                 <Pencil />
