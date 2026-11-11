@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, isObjectId } from "@/lib/current-user";
-import { streamText } from "ai";
+import { streamText, createTextStreamResponse, toTextStream } from "ai";
 import { exaoneModel, exaoneOptions, SYSTEM_PROMPT } from "@/lib/ai";
 
 const HISTORY_LIMIT = 10; // 몇개의 채팅을 불러올지
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
       ],
       providerOptions: exaoneOptions,
       maxRetries: 2, // EXAONE 일시 장애 시 자동 재시도
-      timeout: 30_000,
+      timeout: { firstChunkMs: 30_000, chunkMs: 15_000 },
 
       // (4) 다 끝나면 답변 저장
       onEnd: async ({ text, finalStep }) => {
@@ -84,7 +84,9 @@ export async function POST(req: Request) {
       onError: ({ error }) => console.error("EXAONE stream error:", error),
     });
 
-    return result.toTextStreamResponse();
+    return createTextStreamResponse({
+      stream: toTextStream({ stream: result.stream }),
+    });
   } catch (e) {
     console.error(e);
     return Response.json({ error: "답변을 받지 못했어요. 다시 시도해주세요." }, { status: 500 });
