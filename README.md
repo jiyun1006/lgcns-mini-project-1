@@ -36,16 +36,6 @@ npm run dev
 | `DATABASE_URL`   | MongoDB Atlas 연결 주소 (DB 이름 `mjp1` 포함)                |
 | `EXAONE_API_KEY` | EXAONE API 키 (**서버 코드에서만 사용, 브라우저 노출 금지**) |
 
-### 환경변수 (`.env.local`)
-
-| 키               | 설명                                                                                                                          |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `MONGODB_URI`    | MongoDB Atlas 연결 주소 (mongodb+srv://<사용자명>:<비밀번호>@cluster0.srw7iuw.mongodb.net/exaone?retryWrites=true&w=majority) |
-| `MONGODB_DB`     | MongoDB Atlas DB명 (`exaone_chat`)                                                                                            |
-| `EXAONE_API_KEY` | EXAONE API 키 (**서버 코드에서만 사용, 브라우저 노출 금지**)                                                                  |
-
-> 실제 값은 절대 커밋하지 마세요. 키를 추가하면 `.env.example`에도 키 이름을 추가해주세요.
-
 ## 서비스 구조
 
 ```
