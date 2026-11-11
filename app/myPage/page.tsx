@@ -20,6 +20,9 @@ async function MyPageContent() {
         profileImageUrl,
         bio: user.bio ?? "",
         interests: user.interests,
+        isProfilePublic: user.isProfilePublic ?? true,
+        showEmail: user.showEmail ?? false, // 이메일은 본인이 켜기 전까지 비공개
+        showInterests: user.showInterests ?? true,
       }}
     />
   );
@@ -33,12 +36,6 @@ export default function myPage() {
       </Suspense>
       {/*section 내 프로필 기본 정보 (미구현)
     외부 프로필 링크 URL 입력 추가 버튼 추가되면 direction할 수 있도록
-    */}
-      {/* section
-    자기 정보 비공개 기능 오른쪽 칸
-    토글로 껐다 키기
-    이메일 및 외부 링크 공개 여부 체크박스
-    관심사 및 자기 한마디 공개 여부 체크박스
     */}
       {/* section
     연결 계정 (미구현)

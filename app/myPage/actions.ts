@@ -10,7 +10,12 @@ import {
   toProfileImageDataUrl,
 } from "@/lib/mypage/profileImage";
 import { normalizeInterests, validateIntro } from "@/lib/mypage/validateIntro";
-import type { IntroFormState, ProfileField, ProfileFormState } from "@/types/mypage";
+import type {
+  IntroFormState,
+  PrivacyFormState,
+  ProfileField,
+  ProfileFormState,
+} from "@/types/mypage";
 
 const LOGIN_ID_PATTERN = /^[a-z0-9_]{1,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,6 +99,25 @@ export async function updateIntro(
   await prisma.user.update({
     where: { id: user.id },
     data: { bio: bio || null, interests },
+  });
+
+  refresh();
+  return { ok: true };
+}
+
+// 체크하지 않은 체크박스는 FormData에 아예 없으므로 값이 "on"인지만 본다
+export async function updatePrivacy(
+  _prevState: PrivacyFormState,
+  formData: FormData,
+): Promise<PrivacyFormState> {
+  const user = await getCurrentUser();
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      isProfilePublic: formData.get("isProfilePublic") === "on",
+      showEmail: formData.get("showEmail") === "on",
+      showInterests: formData.get("showInterests") === "on",
+    },
   });
 
   refresh();

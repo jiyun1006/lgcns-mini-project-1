@@ -4,6 +4,7 @@ import { buttonVariants } from "@/components/mypage/atoms/MyPageButton";
 import AccountCard from "@/components/mypage/organisms/AccountCard";
 import IntroCard from "@/components/mypage/organisms/IntroCard";
 import PasswordChangeCard from "@/components/mypage/organisms/PasswordChangeCard";
+import PrivacyCard from "@/components/mypage/organisms/PrivacyCard";
 import ProfileInfoCard from "@/components/mypage/organisms/ProfileInfoCard";
 import type { MyPageUser } from "@/types/mypage";
 
@@ -20,6 +21,11 @@ export default function MyPageTemplate({ user }: { user: MyPageUser }) {
         </div>
         <ProfileInfoCard user={user} />
         <IntroCard bio={user.bio} interests={user.interests} />
+        <PrivacyCard
+          isProfilePublic={user.isProfilePublic}
+          showEmail={user.showEmail}
+          showInterests={user.showInterests}
+        />
         <PasswordChangeCard />
         <AccountCard />
       </div>

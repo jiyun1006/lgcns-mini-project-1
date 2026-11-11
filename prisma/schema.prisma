@@ -26,6 +26,10 @@ model User {
   password        String? // 소셜 로그인 유저는 비밀번호 없음
   interests       String[] @default([]) // 관심사 태그 (강사님 API는 안 받아서 우리 Mongo에)
   bio             String? // 자기소개 (150자 미만)
+  // 공개 설정: 기존 문서에 없어도 읽히도록 선택 필드, 코드에서 ?? true로 기본값 처리
+  isProfilePublic Boolean? // 프로필 전체 공개 여부
+  showEmail       Boolean? // 이메일 공개 여부
+  showInterests   Boolean? // 자기소개·관심사 공개 여부
   createdAt       DateTime @default(now())
 
   conversations Conversation[]
