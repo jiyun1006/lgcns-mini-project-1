@@ -93,7 +93,7 @@ export default function ChatMessages({
                   padding: "15px",
                   borderRadius: "12px",
                   background: msg.role === "USER" ? "#dce8ff" : "#f1f1f1",
-                  whiteSpace: "pre-wrap",
+                  whiteSpace: msg.role === "USER" ? "pre-wrap" : "normal",
                   lineHeight: "1.6",
                   overflowWrap: "anywhere",
                 }}
