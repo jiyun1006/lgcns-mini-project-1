@@ -66,32 +66,53 @@ enum Role {
 // 📝 게시판 (초안 - 게시판 팀 확정 후 수정)
 // ─────────────────────────────
 model Post {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   content   String
-  viewCount Int        @default(0)
-  authorId  String     @db.ObjectId
-  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  comments  Comment[]
-  likes     PostLike[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  category  String   @default("프롬프트 공유")
+  prompt    String   @default("")
+  result    String   @default("")
+  tags      String[] @default([])
+  viewCount Int      @default(0)
 
-  @@index([createdAt]) // 최신순 목록
+  authorId String   @db.ObjectId
+  author   User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    PostLike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([category, createdAt])
+  @@index([authorId, createdAt])
 }
 
+// 댓글과 답글
 model Comment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   content   String
+  deleted   Boolean  @default(false)
+
   postId    String   @db.ObjectId
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   authorId  String   @db.ObjectId
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
 
-  @@index([postId, createdAt]) // 게시글 댓글 시간순
+  // 답글은 같은 Comment 모델의 부모 댓글을 참조함.
+  // MongoDB의 Prisma 자기 참조 관계에서는 NoAction이 필요함.
+  parentId  String?   @db.ObjectId
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
+  @@index([postId, parentId])
 }
 
+// 게시글 좋아요 (사용자당 게시글 1회)
 model PostLike {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
@@ -100,5 +121,5 @@ model PostLike {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
-  @@unique([userId, postId]) // 한 사람이 한 글에 좋아요 한 번만
+  @@unique([userId, postId])
 }

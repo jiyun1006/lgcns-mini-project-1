@@ -1,5 +1,7 @@
 import type { ChatMessage } from "@/types/chat";
 import { StickToBottom } from "use-stick-to-bottom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type ChatMessagesProps = {
   messages: ChatMessage[];
@@ -55,20 +57,25 @@ export default function ChatMessages({
                 marginBottom: "20px",
               }}
             >
-              <div
-                style={{
-                  maxWidth: "75%",
-                  padding: "15px",
-                  borderRadius: "12px",
-                  background: msg.role === "USER" ? "#dce8ff" : "#f1f1f1",
-                  whiteSpace: "pre-wrap",
-                  lineHeight: "1.6",
-                  overflowWrap: "anywhere",
-                }}
-              >
-                <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
+              <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
+              {msg.role === "ASSISTANT" ? (
+                <div className="markdown-content">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      a: ({ href, children }) => (
+                        <a href={href} target="_blank" rel="noopener noreferrer">
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
                 <p style={{ marginBottom: 0 }}>{msg.content}</p>
-              </div>
+              )}
             </div>
           ))
         )}
