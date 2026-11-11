@@ -5,6 +5,7 @@ import AccountCard from "@/components/mypage/organisms/AccountCard";
 import ActivityCard from "@/components/mypage/organisms/ActivityCard";
 import PasswordChangeCard from "@/components/mypage/organisms/PasswordChangeCard";
 import ProfileInfoCard from "@/components/mypage/organisms/ProfileInfoCard";
+import WithdrawCard from "@/components/mypage/organisms/WithdrawCard";
 import type { MyPageUser } from "@/types/mypage";
 
 export default function MyPageTemplate({ user }: { user: MyPageUser }) {
@@ -22,6 +23,7 @@ export default function MyPageTemplate({ user }: { user: MyPageUser }) {
         <PasswordChangeCard />
         <AccountCard />
         <ActivityCard />
+        <WithdrawCard />
       </div>
     </div>
   );
