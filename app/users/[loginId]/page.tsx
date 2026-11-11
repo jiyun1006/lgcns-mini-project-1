@@ -40,7 +40,7 @@ async function PublicProfile({ params }: { params: PageProps<"/users/[loginId]">
             <AvatarFallback className="text-2xl">{user.name.slice(0, 1)}</AvatarFallback>
           </Avatar>
           <div className="grid">
-            <h1 className="text-lg font-bold text-stone-900">{user.name}</h1>
+            <h2 className="text-lg font-bold text-stone-900">{user.name}</h2>
             <span className="text-sm text-stone-500">@{user.loginId}</span>
           </div>
         </div>
@@ -95,15 +95,18 @@ export default function UserProfilePage({ params }: PageProps<"/users/[loginId]"
     <main className="flex flex-1 flex-col">
       <div className="flex-1 bg-[#f3f4f6] px-4 py-8 text-[#222]">
         <div className="mx-auto grid max-w-2xl gap-6">
-          <div className="flex gap-2">
-            <Link href="/users" className={buttonVariants({ variant: "outline" })}>
-              <Search aria-hidden />
-              유저 검색
-            </Link>
-            <Link href="/myPage" className={buttonVariants({ variant: "outline" })}>
-              <UserRound aria-hidden />
-              마이페이지
-            </Link>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold">프로필</h1>
+            <div className="flex gap-2">
+              <Link href="/users" className={buttonVariants({ variant: "outline" })}>
+                <Search aria-hidden />
+                유저 검색
+              </Link>
+              <Link href="/myPage" className={buttonVariants({ variant: "outline" })}>
+                <UserRound aria-hidden />
+                마이페이지
+              </Link>
+            </div>
           </div>
           <Suspense>
             <PublicProfile params={params} />
