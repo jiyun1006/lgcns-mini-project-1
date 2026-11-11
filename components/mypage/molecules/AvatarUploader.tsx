@@ -46,7 +46,7 @@ export default function AvatarUploader({ initialSrc, name }: AvatarUploaderProps
         aria-label="프로필 사진 파일 선택"
       />
       <MyPageButton type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-        <Upload className="text-[#A50034]" />
+        <Upload className="text-board-accent" />
         사진 변경
       </MyPageButton>
     </div>

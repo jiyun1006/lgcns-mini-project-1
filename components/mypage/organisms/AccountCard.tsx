@@ -17,7 +17,7 @@ export default function AccountCard() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-bold text-stone-900">
-          <span className="flex size-8 items-center justify-center rounded-xl bg-[#FDF2F5] text-[#A50034]">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-board-accent-soft text-board-accent">
             <ShieldCheck className="size-4" />
           </span>
           로그인 관리

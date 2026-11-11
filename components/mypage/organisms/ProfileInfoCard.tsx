@@ -48,7 +48,7 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
       <form onSubmit={handleSave} className="contents">
         <CardHeader className="border-b">
           <CardTitle className="flex items-center gap-2 font-bold text-stone-900">
-            <span className="flex size-8 items-center justify-center rounded-xl bg-[#FDF2F5] text-[#A50034]">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-board-accent-soft text-board-accent">
               <User className="size-4" />
             </span>
             내 프로필 및 기본 정보
@@ -56,11 +56,7 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
           <CardDescription>프로필 사진, 닉네임, 아이디, 이메일을 관리합니다</CardDescription>
           <CardAction>
             {isEditing ? (
-              <MyPageButton
-                key="save"
-                type="submit"
-                className="bg-[#A50034] text-white hover:bg-[#87002A]"
-              >
+              <MyPageButton key="save" type="submit">
                 <Save />
                 저장
               </MyPageButton>

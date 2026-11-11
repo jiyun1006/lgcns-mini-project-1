@@ -39,7 +39,7 @@ export default function PasswordChangeCard() {
     <Card>
       <CardHeader className="border-b">
         <CardTitle className="flex items-center gap-2 font-bold text-stone-900">
-          <span className="flex size-8 items-center justify-center rounded-xl bg-[#FDF2F5] text-[#A50034]">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-board-accent-soft text-board-accent">
             <KeyRound className="size-4" />
           </span>
           회원정보 수정
@@ -67,10 +67,7 @@ export default function PasswordChangeCard() {
               {message.text}
             </p>
           )}
-          <MyPageButton
-            type="submit"
-            className="justify-self-end bg-[#A50034] text-white hover:bg-[#87002A]"
-          >
+          <MyPageButton type="submit" className="justify-self-end">
             비밀번호 변경
           </MyPageButton>
         </form>
