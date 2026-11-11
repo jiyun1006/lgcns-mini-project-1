@@ -8,6 +8,7 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   message?: string;
   tone?: FieldTone;
   rightSlot?: ReactNode;
+  bottomSlot?: ReactNode;
   onClear?: () => void;
 };
 
@@ -29,6 +30,7 @@ export default function TextField({
   message,
   tone = "default",
   rightSlot,
+  bottomSlot,
   onClear,
   value,
   className = "",
@@ -62,11 +64,14 @@ export default function TextField({
         ) : null}
         {rightSlot}
       </div>
-      {message ? (
-        <span id={messageId} aria-live="polite" className={`text-[13px] ${messageClass[tone]}`}>
-          {message}
-        </span>
-      ) : null}
+      {bottomSlot}
+      <span
+        id={messageId}
+        aria-live="polite"
+        className={`min-h-5 text-[13px] leading-5 ${messageClass[tone]}`}
+      >
+        {message}
+      </span>
     </div>
   );
 }
