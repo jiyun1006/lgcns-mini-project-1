@@ -1,5 +1,3 @@
-import RenderProfileLinkSection from "@/components/templates/RenderProfileLinkSection";
-
 export default function myPage() {
   return (
     <main>
@@ -27,9 +25,6 @@ export default function myPage() {
       {/* 
     로그아웃, 회원탈퇴 버튼     
     */}
-      <section>
-        <RenderProfileLinkSection />
-      </section>
     </main>
   );
 }
