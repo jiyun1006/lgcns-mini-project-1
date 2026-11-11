@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import BoardProvider from "@/components/board/BoardProvider";
+import AuthShell from "@/components/providers/AuthShell";
 import "./globals.css";
 import "./posts/board.css";
 import { Suspense } from "react";
