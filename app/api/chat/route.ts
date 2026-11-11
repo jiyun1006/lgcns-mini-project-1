@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/prisma";
-import { askExaone } from "@/lib/ai";
 import { getCurrentUser, isObjectId } from "@/lib/current-user";
+import { streamText } from "ai";
+import { exaoneModel, exaoneOptions, SYSTEM_PROMPT } from "@/lib/ai";
+
+const HISTORY_LIMIT = 10; // 몇개의 채팅을 불러올지
 
 export const maxDuration = 60; // Vercel 배포 시 60초까지 허용
 
 const TITLE_MAX = 40;
-
-const messageSelect = { id: true, role: true, content: true, createdAt: true } as const;
 
 export async function POST(req: Request) {
   try {
@@ -37,53 +38,53 @@ export async function POST(req: Request) {
       return Response.json({ error: "대화를 찾을 수 없어요." }, { status: 404 });
     }
 
-    // 3. 이전 대화 + 새 질문으로 AI 호출 (아직 DB에 저장 안 함)
-    const history = await prisma.message.findMany({
+    const recent = await prisma.message.findMany({
       where: { conversationId: conv.id },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: "desc" },
+      take: HISTORY_LIMIT,
     });
+    const history = recent.reverse();
 
-    const answer = await askExaone([
-      ...history.map((m) => ({
-        role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
-        content: m.content,
-      })),
-      { role: "user", content },
-    ]);
-
-    if (!answer.content) {
-      return Response.json({ error: "EXAONE 답변이 비어 있어요." }, { status: 502 });
-    }
-
-    // 4. AI 성공 → 질문 + 답변 같이 저장, 대화방 시간 갱신 (첫 질문이면 제목도 설정)
-    const [userMsg, aiMsg] = await prisma.$transaction([
-      prisma.message.create({
-        data: { role: "USER", content, conversationId: conv.id },
-        select: messageSelect,
-      }),
-      prisma.message.create({
-        data: {
-          role: "ASSISTANT",
-          content: answer.content,
-          reasoning: answer.reasoning,
-          conversationId: conv.id,
-        },
-        select: messageSelect,
-      }),
+    const isFirst = history.length === 0;
+    await prisma.$transaction([
+      prisma.message.create({ data: { role: "USER", content, conversationId: conv.id } }),
       prisma.conversation.update({
         where: { id: conv.id },
-        data: {
-          updatedAt: new Date(),
-          ...(history.length === 0 ? { title: content.slice(0, TITLE_MAX) } : {}),
-        },
+        data: { updatedAt: new Date(), ...(isFirst ? { title: content.slice(0, TITLE_MAX) } : {}) },
       }),
     ]);
 
-    return Response.json({
-      conversationId: conv.id,
-      answer: answer.content,
-      messages: [userMsg, aiMsg],
+    // (3) 스트리밍 시작
+    const result = streamText({
+      model: exaoneModel,
+      instructions: SYSTEM_PROMPT,
+      messages: [
+        ...history.map((m) => ({
+          role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
+          content: m.content,
+        })),
+        { role: "user" as const, content },
+      ],
+      providerOptions: exaoneOptions,
+      maxRetries: 2, // EXAONE 일시 장애 시 자동 재시도
+      timeout: 30_000,
+
+      // (4) 다 끝나면 답변 저장
+      onEnd: async ({ text, finalStep }) => {
+        if (!text.trim()) return;
+        await prisma.message.create({
+          data: {
+            role: "ASSISTANT",
+            content: text,
+            reasoning: finalStep.reasoningText ?? null,
+            conversationId: conv.id,
+          },
+        });
+      },
+      onError: ({ error }) => console.error("EXAONE stream error:", error),
     });
+
+    return result.toTextStreamResponse();
   } catch (e) {
     console.error(e);
     return Response.json({ error: "답변을 받지 못했어요. 다시 시도해주세요." }, { status: 500 });
