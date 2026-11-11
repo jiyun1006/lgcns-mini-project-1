@@ -7,6 +7,7 @@ type ChatSidebarProps = {
   onSelect: (id: string) => Promise<void>;
   onRename: (id: string, currentTitle: string) => void;
   onDelete: (id: string) => void;
+  onToggle: () => void;
 };
 
 export default function ChatSidebar({
@@ -16,6 +17,7 @@ export default function ChatSidebar({
   onSelect,
   onRename,
   onDelete,
+  onToggle,
 }: ChatSidebarProps) {
   return (
     <aside
@@ -31,7 +33,36 @@ export default function ChatSidebar({
         borderRight: "1px solid #ddd",
       }}
     >
-      <h2 style={{ fontSize: "22px", marginTop: 0 }}>EXAONE Chat</h2>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "8px",
+          marginBottom: "24px",
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>EXAONE Chat</h2>
+
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label="사이드바 닫기"
+          title="사이드바 닫기"
+          style={{
+            width: "36px",
+            height: "36px",
+            flexShrink: 0,
+            border: "1px solid #d1d5db",
+            borderRadius: "8px",
+            background: "#fff",
+            cursor: "pointer",
+            fontSize: "18px",
+          }}
+        >
+          ☰
+        </button>
+      </div>
 
       <button
         type="button"
