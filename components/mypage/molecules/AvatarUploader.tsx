@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { Upload } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { MyPageButton } from "@/components/mypage/atoms/MyPageButton";
 
 type AvatarUploaderProps = { initialSrc: string | null; name: string };
 
@@ -45,10 +45,10 @@ export default function AvatarUploader({ initialSrc, name }: AvatarUploaderProps
         className="hidden"
         aria-label="프로필 사진 파일 선택"
       />
-      <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+      <MyPageButton type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
         <Upload className="text-[#A50034]" />
         사진 변경
-      </Button>
+      </MyPageButton>
     </div>
   );
 }

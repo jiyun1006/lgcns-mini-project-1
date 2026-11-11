@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { KeyRound } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MyPageButton } from "@/components/mypage/atoms/MyPageButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import FormField from "@/components/mypage/molecules/FormField";
 import { validatePasswordChange, type PasswordChangeInput } from "@/lib/mypage/validatePassword";
@@ -67,12 +67,12 @@ export default function PasswordChangeCard() {
               {message.text}
             </p>
           )}
-          <Button
+          <MyPageButton
             type="submit"
             className="justify-self-end bg-[#A50034] text-white hover:bg-[#87002A]"
           >
             비밀번호 변경
-          </Button>
+          </MyPageButton>
         </form>
       </CardContent>
     </Card>

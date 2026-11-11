@@ -39,7 +39,7 @@ const buttonVariants = cva(
   },
 );
 
-function Button({
+function MyPageButton({
   className,
   variant = "default",
   size = "default",
@@ -54,4 +54,4 @@ function Button({
   );
 }
 
-export { Button, buttonVariants };
+export { MyPageButton, buttonVariants };

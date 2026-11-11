@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MyPageButton } from "@/components/mypage/atoms/MyPageButton";
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function AccountCard() {
@@ -24,10 +24,10 @@ export default function AccountCard() {
         </CardTitle>
         <CardDescription>현재 기기에서 로그아웃합니다</CardDescription>
         <CardAction>
-          <Button type="button" variant="outline" onClick={handleLogout}>
+          <MyPageButton type="button" variant="outline" onClick={handleLogout}>
             <LogOut />
             로그아웃
-          </Button>
+          </MyPageButton>
         </CardAction>
       </CardHeader>
     </Card>

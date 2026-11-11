@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Pencil, Save, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MyPageButton } from "@/components/mypage/atoms/MyPageButton";
 import {
   Card,
   CardAction,
@@ -56,19 +56,19 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
           <CardDescription>프로필 사진, 닉네임, 아이디, 이메일을 관리합니다</CardDescription>
           <CardAction>
             {isEditing ? (
-              <Button
+              <MyPageButton
                 key="save"
                 type="submit"
                 className="bg-[#A50034] text-white hover:bg-[#87002A]"
               >
                 <Save />
                 저장
-              </Button>
+              </MyPageButton>
             ) : (
-              <Button key="edit" type="button" onClick={startEditing}>
+              <MyPageButton key="edit" type="button" onClick={startEditing}>
                 <Pencil />
                 정보수정
-              </Button>
+              </MyPageButton>
             )}
           </CardAction>
         </CardHeader>
