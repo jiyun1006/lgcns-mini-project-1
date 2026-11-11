@@ -9,7 +9,8 @@ import {
   PROFILE_IMAGE_SIZE_ERROR,
   toProfileImageDataUrl,
 } from "@/lib/mypage/profileImage";
-import type { ProfileField, ProfileFormState } from "@/types/mypage";
+import { normalizeInterests, validateIntro } from "@/lib/mypage/validateIntro";
+import type { IntroFormState, ProfileField, ProfileFormState } from "@/types/mypage";
 
 const LOGIN_ID_PATTERN = /^[a-z0-9_]{1,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,6 +73,28 @@ export async function updateProfile(
       return { errors: { email: "이미 사용 중인 이메일입니다." } };
     throw error;
   }
+
+  refresh();
+  return { ok: true };
+}
+
+export async function updateIntro(
+  _prevState: IntroFormState,
+  formData: FormData,
+): Promise<IntroFormState> {
+  const bioEntry = formData.get("bio");
+  const bio = typeof bioEntry === "string" ? bioEntry.trim() : "";
+  const interests = normalizeInterests(
+    formData.getAll("interests").filter((tag): tag is string => typeof tag === "string"),
+  );
+  const errors = validateIntro(bio, interests);
+  if (errors.bio || errors.interests) return { errors };
+
+  const user = await getCurrentUser();
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { bio: bio || null, interests },
+  });
 
   refresh();
   return { ok: true };

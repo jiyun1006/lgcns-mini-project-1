@@ -25,6 +25,7 @@ model User {
   profileImageUrl String? // 프로필 사진 URL (선택)
   password        String? // 소셜 로그인 유저는 비밀번호 없음
   interests       String[] @default([]) // 관심사 태그 (강사님 API는 안 받아서 우리 Mongo에)
+  bio             String? // 자기소개 (150자 미만)
   createdAt       DateTime @default(now())
 
   conversations Conversation[]

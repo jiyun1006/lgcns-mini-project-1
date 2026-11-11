@@ -18,6 +18,8 @@ async function MyPageContent() {
         loginId: user.loginId ?? "",
         email: user.email,
         profileImageUrl,
+        bio: user.bio ?? "",
+        interests: user.interests,
       }}
     />
   );
@@ -33,10 +35,6 @@ export default function myPage() {
     외부 프로필 링크 URL 입력 추가 버튼 추가되면 direction할 수 있도록
     */}
       {/* section
-    관심사 자기 한마디 내용 저장 왼쪽 칸
-    관심사 작성 (텍스트 75자 미만)
-    자기 한마디 작성 (텍스트 150자 미만)
-
     자기 정보 비공개 기능 오른쪽 칸
     토글로 껐다 키기
     이메일 및 외부 링크 공개 여부 체크박스

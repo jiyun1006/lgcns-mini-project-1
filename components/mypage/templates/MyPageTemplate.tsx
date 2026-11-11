@@ -2,6 +2,7 @@ import { House } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/mypage/atoms/MyPageButton";
 import AccountCard from "@/components/mypage/organisms/AccountCard";
+import IntroCard from "@/components/mypage/organisms/IntroCard";
 import PasswordChangeCard from "@/components/mypage/organisms/PasswordChangeCard";
 import ProfileInfoCard from "@/components/mypage/organisms/ProfileInfoCard";
 import type { MyPageUser } from "@/types/mypage";
@@ -18,6 +19,7 @@ export default function MyPageTemplate({ user }: { user: MyPageUser }) {
           </Link>
         </div>
         <ProfileInfoCard user={user} />
+        <IntroCard bio={user.bio} interests={user.interests} />
         <PasswordChangeCard />
         <AccountCard />
       </div>
