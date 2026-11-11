@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
-import Alert from "@/components/atoms/Alert";
-import Button from "@/components/atoms/Button";
-import TextField from "@/components/molecules/TextField";
+import Alert from "@/components/auth/atoms/Alert";
+import Button from "@/components/auth/atoms/Button";
+import TextField from "@/components/auth/molecules/TextField";
 import { findIdAction, type FindIdState } from "@/actions/findIdActions";
 
 const initialState: FindIdState = {};

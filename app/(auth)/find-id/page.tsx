@@ -1,4 +1,4 @@
-import FindIdForm from "@/components/organisms/FindIdForm";
+import FindIdForm from "@/components/auth/organisms/FindIdForm";
 
 export default function FindIdPage() {
   return (

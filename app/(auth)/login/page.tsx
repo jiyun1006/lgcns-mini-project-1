@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 
-import AuthFormSkeleton from "@/components/molecules/AuthFormSkeleton";
-import LoginForm from "@/components/organisms/LoginForm";
+import AuthFormSkeleton from "@/components/auth/molecules/AuthFormSkeleton";
+import LoginForm from "@/components/auth/organisms/LoginForm";
 import { SAVED_EMAIL_COOKIE } from "@/lib/savedEmail";
 
 async function LoginFormWithSavedEmail() {

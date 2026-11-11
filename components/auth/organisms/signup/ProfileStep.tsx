@@ -1,7 +1,7 @@
-import AvatarPicker from "@/components/molecules/AvatarPicker";
-import TagInput from "@/components/molecules/TagInput";
-import TextField from "@/components/molecules/TextField";
-import type { SignupValues, UpdateSignupValue } from "@/components/organisms/SignupForm";
+import AvatarPicker from "@/components/auth/molecules/AvatarPicker";
+import TagInput from "@/components/auth/molecules/TagInput";
+import TextField from "@/components/auth/molecules/TextField";
+import type { SignupValues, UpdateSignupValue } from "@/components/auth/organisms/SignupForm";
 import { describeCheck, type AvailabilityCheck } from "@/hooks/useAvailabilityCheck";
 import { NICKNAME_RULE } from "@/lib/validation/auth";
 

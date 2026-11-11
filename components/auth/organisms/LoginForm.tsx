@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
-import Alert from "@/components/atoms/Alert";
-import Button from "@/components/atoms/Button";
-import PasswordField from "@/components/molecules/PasswordField";
-import SocialLoginButtons from "@/components/molecules/SocialLoginButtons";
-import TextField from "@/components/molecules/TextField";
+import Alert from "@/components/auth/atoms/Alert";
+import Button from "@/components/auth/atoms/Button";
+import PasswordField from "@/components/auth/molecules/PasswordField";
+import SocialLoginButtons from "@/components/auth/molecules/SocialLoginButtons";
+import TextField from "@/components/auth/molecules/TextField";
 import { forgetEmail, rememberEmail } from "@/lib/savedEmail";
 import { authApi } from "@/service/auth/authApi";
 import { CONTINUE_PATH } from "@/lib/returnTo";

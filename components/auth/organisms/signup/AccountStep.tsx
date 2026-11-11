@@ -1,7 +1,7 @@
-import PasswordField from "@/components/molecules/PasswordField";
-import PasswordStrength from "@/components/molecules/PasswordStrength";
-import TextField from "@/components/molecules/TextField";
-import type { SignupValues, UpdateSignupValue } from "@/components/organisms/SignupForm";
+import PasswordField from "@/components/auth/molecules/PasswordField";
+import PasswordStrength from "@/components/auth/molecules/PasswordStrength";
+import TextField from "@/components/auth/molecules/TextField";
+import type { SignupValues, UpdateSignupValue } from "@/components/auth/organisms/SignupForm";
 import { describeCheck, type AvailabilityCheck } from "@/hooks/useAvailabilityCheck";
 import { validateEmail, validatePassword, validatePasswordConfirm } from "@/lib/validation/auth";
 
