@@ -81,3 +81,64 @@ export const mockComments: BoardComment[] = [
 export function findMockPost(id: string) {
   return mockPosts.find((post) => post.id === id);
 }
+
+mockPosts.push(
+  {
+    id: "5",
+    category: "프롬프트 공유",
+    title: "자기소개서 첨삭 프롬프트: 과장 표현만 골라내기",
+    content: "문장을 새로 쓰는 대신 과장되거나 근거 없는 표현만 표시하고 이유를 달게 했어요.",
+    prompt: "[자기소개서]에서 과장된 표현을 찾아 이유와 확인 질문을 적어 줘.",
+    result: "사실과 근거를 점검하기 편했어요.",
+    tags: ["자기소개서", "첨삭"],
+    author: "careerlab",
+    createdAt: "2026-11-05",
+    viewCount: 2675,
+    likeCount: 152,
+    commentCount: 0,
+  },
+  {
+    id: "6",
+    category: "프롬프트 공유",
+    title: "영어 이메일 톤 조절 프롬프트 (정중함 3단계)",
+    content: "같은 내용을 가볍게, 기본, 아주 정중하게 세 가지 버전으로 받아 골라 쓰는 방법이에요.",
+    prompt: "[이메일]을 정중함 3단계의 영어로 작성해 줘.",
+    result: "상대방에 맞게 고를 수 있었어요.",
+    tags: ["이메일", "영어"],
+    author: "mailpro",
+    createdAt: "2026-11-04",
+    viewCount: 1840,
+    likeCount: 133,
+    commentCount: 0,
+  },
+  {
+    id: "7",
+    category: "활용 후기",
+    title: "데이터 분석 과제에서 코드 대신 해설만 받는 방법",
+    content: "정답 코드 대신 원리와 힌트만 주도록 조건을 걸었어요.",
+    prompt: "[문제]의 정답 코드를 주지 말고 개념과 힌트만 알려 줘.",
+    result: "직접 풀면서 이해할 수 있었어요.",
+    tags: ["공부법", "파이썬"],
+    author: "study_hye",
+    createdAt: "2026-11-03",
+    viewCount: 2210,
+    likeCount: 120,
+    commentCount: 0,
+  },
+  {
+    id: "8",
+    category: "질문",
+    title: "시스템 프롬프트에 역할을 너무 길게 쓰면 생기는 일",
+    content: "역할 설명을 길게 넣었더니 답변이 오히려 짧아졌어요. 왜 그런지 아시는 분 있나요?",
+    prompt: "",
+    result: "",
+    tags: ["시스템프롬프트"],
+    author: "newbie_dev",
+    createdAt: "2026-11-10",
+    viewCount: 980,
+    likeCount: 64,
+    commentCount: 0,
+  },
+);
+mockPosts[0].result =
+  "| 담당자 | 할 일 | 마감일 | 근거 문장 |\n| --- | --- | --- | --- |\n| 민수 | 랜딩 페이지 시안 공유 | 11/12 | 수요일까지 시안 올릴게요 |\n| 미정 | 사용자 인터뷰 일정 잡기 | 미정 | 인터뷰도 해야 할 것 같아요 |\n\n근거 문장 열을 넣었더니 AI가 지어낸 할 일을 바로 찾아낼 수 있었어요.";
