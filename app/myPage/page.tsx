@@ -1,8 +1,11 @@
+import MyPageTemplate from "@/components/mypage/templates/MyPageTemplate";
+import { mockUser } from "@/lib/mypage/mockUser";
+
 export default function myPage() {
   return (
-    <main>
-      {/*section 내 프로필 기본 정보 
-    이름, 프사, 사진 변경 반으로 쪼개 왼쪽으로 보기  오른쪽은 닉네임, 이메일
+    <main className="flex flex-1 flex-col">
+      <MyPageTemplate user={mockUser} />
+      {/*section 내 프로필 기본 정보 (미구현)
     외부 프로필 링크 URL 입력 추가 버튼 추가되면 direction할 수 있도록
     */}
       {/* section
