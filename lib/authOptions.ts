@@ -18,7 +18,10 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const result = await springAuthLogin(credentials.email, credentials.password);
+        const result = await springAuthLogin(
+          credentials.email.trim().toLowerCase(),
+          credentials.password,
+        );
         if (!result.ok) throw new Error(result.message);
         const data = result.data;
 

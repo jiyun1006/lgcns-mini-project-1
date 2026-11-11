@@ -10,9 +10,10 @@ import SocialLoginButtons from "@/components/molecules/SocialLoginButtons";
 import TextField from "@/components/molecules/TextField";
 import { forgetEmail, rememberEmail } from "@/lib/savedEmail";
 import { authApi } from "@/service/auth/authApi";
+import { CONTINUE_PATH } from "@/lib/returnTo";
 
 // 🔌 진짜 API를 붙일 때 CONTINUE_PATH(원래 페이지로)로 바꿔요 (6-4)
-const AFTER_LOGIN_PATH = "/";
+const AFTER_LOGIN_PATH = CONTINUE_PATH;
 
 type LoginValues = { email: string; password: string };
 type LoginErrors = Partial<Record<keyof LoginValues, string>>;
