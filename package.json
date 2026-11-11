@@ -9,6 +9,7 @@
     "lint": "eslint",
     "format": "prettier --write",
     "prepare": "husky",
+    "postinstall": "prisma generate",
     "test": "node --import tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
