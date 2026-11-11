@@ -1,8 +1,48 @@
 "use client";
 import Link from "next/link";
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useBoard } from "./BoardProvider";
+import { USER, validatePost, type PostInput } from "@/lib/board/logic";
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
 import { categories, type BoardPost } from "@/types/board";
-export default function PostForm({ post }: { post?: BoardPost }) {
+export default function PostForm({ postId }: { postId?: string }) {
+  const { posts, commit } = useBoard();
+  const post = posts.find((p) => p.id === postId);
+  if (postId && !post)
+    return (
+      <main className="board-main">
+        <h1>게시글을 찾을 수 없어요</h1>
+        <Link href="/posts">목록으로</Link>
+      </main>
+    );
+  if (post && post.author !== USER)
+    return (
+      <main className="board-main">
+        <h1>본인의 게시글만 수정할 수 있어요</h1>
+        <Link href={`/posts/${post.id}`}>게시글로 돌아가기</Link>
+      </main>
+    );
+  return <Editor key={postId || "new"} post={post} commit={commit} />;
+}
+function Editor({
+  post,
+  commit,
+}: {
+  post?: BoardPost;
+  commit: ReturnType<typeof useBoard>["commit"];
+}) {
+  const router = useRouter();
+  const [dirty, setDirty] = useState(false);
+  useEffect(() => {
+    const warn = (e: BeforeUnloadEvent) => {
+      if (dirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
   const [tags, setTags] = useState<string[]>(post?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
   const [notice, setNotice] = useState("");
@@ -10,21 +50,61 @@ export default function PostForm({ post }: { post?: BoardPost }) {
     if (e.key !== "Enter" || e.nativeEvent.isComposing) return;
     e.preventDefault();
     const value = tagInput.trim().replace(/^#/, "");
-    if (value && !tags.includes(value) && tags.length < 5) {
+    if (value && value.length <= 20 && !tags.includes(value) && tags.length < 5) {
       setTags([...tags, value]);
+      setDirty(true);
       setTagInput("");
     }
   }
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setNotice(
-      "입력값을 확인했어요. 현재는 화면 뼈대이며 저장 API를 연결해야 실제 등록·수정됩니다.",
-    );
+    const data = new FormData(e.currentTarget);
+    const pending = tagInput.trim().replace(/^#+/, "");
+    const values: PostInput = {
+      category: data.get("category") as BoardPost["category"],
+      title: String(data.get("title") || "").trim(),
+      content: String(data.get("content") || "").trim(),
+      prompt: String(data.get("prompt") || ""),
+      result: String(data.get("result") || ""),
+      tags: [...new Set([...tags, ...(pending ? [pending] : [])])],
+    };
+    try {
+      validatePost(values);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "입력값을 확인해 주세요.");
+      return;
+    }
+    const id = post?.id || crypto.randomUUID();
+    const saved = commit((list) => {
+      if (post) {
+        const current = list.find((p) => p.id === id);
+        if (current?.author !== USER) throw new Error("본인 게시글만 수정할 수 있어요.");
+        return list.map((p) => (p.id === id ? { ...p, ...values } : p));
+      }
+      return [
+        {
+          ...values,
+          id,
+          author: USER,
+          createdAt: new Date().toISOString(),
+          viewCount: 0,
+          likeCount: 0,
+          commentCount: 0,
+          comments: [],
+          liked: false,
+        },
+        ...list,
+      ];
+    });
+    if (saved) {
+      setDirty(false);
+      router.push(`/posts/${id}`);
+    }
   }
   return (
     <main className="board-main narrow">
       <h1>{post ? "게시글 수정" : "새 게시글 작성"}</h1>
-      <form onSubmit={submit}>
+      <form onSubmit={submit} onChange={() => setDirty(true)}>
         <div className="form-top">
           <label>
             카테고리
@@ -49,6 +129,7 @@ export default function PostForm({ post }: { post?: BoardPost }) {
           <label htmlFor="content">AI 활용 목적·과정</label>
           <p className="muted">무엇을 하려고 AI를 썼는지, 어떤 순서로 시도했는지 적어 주세요.</p>
           <textarea
+            maxLength={20000}
             id="content"
             name="content"
             required
@@ -60,6 +141,7 @@ export default function PostForm({ post }: { post?: BoardPost }) {
           <label htmlFor="prompt">공유할 프롬프트</label>
           <p className="muted">다른 사람이 바꿔 쓸 부분은 [대괄호]로 표시하면 좋아요.</p>
           <textarea
+            maxLength={20000}
             id="prompt"
             name="prompt"
             defaultValue={post?.prompt}
@@ -69,9 +151,10 @@ export default function PostForm({ post }: { post?: BoardPost }) {
         <div className="form-field">
           <label htmlFor="result">AI 답변 예시·활용 후기</label>
           <p className="muted">
-            실제로 받은 답변 일부와 써 보니 어땠는지 적어 주세요. 현재는 일반 텍스트로 표시해요.
+            실제로 받은 답변 일부와 써 보니 어땠는지 적어 주세요. 마크다운과 표를 쓸 수 있어요.
           </p>
           <textarea
+            maxLength={20000}
             id="result"
             name="result"
             defaultValue={post?.result}
@@ -86,7 +169,10 @@ export default function PostForm({ post }: { post?: BoardPost }) {
                 type="button"
                 key={t}
                 aria-label={`${t} 태그 삭제`}
-                onClick={() => setTags(tags.filter((tag) => tag !== t))}
+                onClick={() => {
+                  setTags(tags.filter((tag) => tag !== t));
+                  setDirty(true);
+                }}
               >
                 #{t} ×
               </button>
@@ -97,14 +183,20 @@ export default function PostForm({ post }: { post?: BoardPost }) {
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={addTag}
               placeholder="태그 입력 후 Enter (최대 5개)"
-              maxLength={30}
+              maxLength={20}
             />
           </div>
           <input type="hidden" name="tags" value={JSON.stringify(tags)} />
         </div>
         <p role="status">{notice}</p>
         <div className="form-actions">
-          <Link className="button" href={post ? `/posts/${post.id}` : "/posts"}>
+          <Link
+            className="button"
+            href={post ? `/posts/${post.id}` : "/posts"}
+            onClick={(e) => {
+              if (dirty && !confirm("작성 중인 내용을 버리고 나갈까요?")) e.preventDefault();
+            }}
+          >
             취소
           </Link>
           <button className="primary" type="submit">
