@@ -1,10 +1,31 @@
-import RenderProfileLinkSection from "@/components/templates/RenderProfileLinkSection";
+import { Suspense } from "react";
+import { connection } from "next/server";
+import MyPageTemplate from "@/components/mypage/templates/MyPageTemplate";
+import { getCurrentUser } from "@/lib/current-user";
+
+async function MyPageContent() {
+  await connection(); // 프리렌더 때 고정되지 않고 요청마다 DB를 조회하게 한다
+  const user = await getCurrentUser();
+  return (
+    <MyPageTemplate
+      user={{
+        nickname: user.name,
+        // shortcut: User 스키마에 loginId·profileImageUrl이 없어 비워 둠, 필드 추가 후 연결
+        loginId: "",
+        email: user.email,
+        profileImageUrl: null,
+      }}
+    />
+  );
+}
 
 export default function myPage() {
   return (
-    <main>
-      {/*section 내 프로필 기본 정보 
-    이름, 프사, 사진 변경 반으로 쪼개 왼쪽으로 보기  오른쪽은 닉네임, 이메일
+    <main className="flex flex-1 flex-col">
+      <Suspense>
+        <MyPageContent />
+      </Suspense>
+      {/*section 내 프로필 기본 정보 (미구현)
     외부 프로필 링크 URL 입력 추가 버튼 추가되면 direction할 수 있도록
     */}
       {/* section
@@ -18,18 +39,13 @@ export default function myPage() {
     관심사 및 자기 한마디 공개 여부 체크박스
     */}
       {/* section
-    비밀번호 변경 및 연결 계정 
-    비밀번호 변경 버튼 -> 클릭 시 hidden input 창 뜨면서 비밀번호 변경 가능 현재 비밀번호, 새 비밀번호, 새 비밀번호 확인 
-
+    연결 계정 (미구현)
     연결된 소셜 계정 관리
     카카오, 구글 뭘로 연결되어있는지 확인만
     */}
       {/* 
-    로그아웃, 회원탈퇴 버튼     
+    회원탈퇴 버튼 (미구현)
     */}
-      <section>
-        <RenderProfileLinkSection />
-      </section>
     </main>
   );
 }
