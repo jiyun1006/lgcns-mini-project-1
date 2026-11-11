@@ -57,25 +57,37 @@ export default function ChatMessages({
                 marginBottom: "20px",
               }}
             >
-              <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
-              {msg.role === "ASSISTANT" ? (
-                <div className="markdown-content">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      a: ({ href, children }) => (
-                        <a href={href} target="_blank" rel="noopener noreferrer">
-                          {children}
-                        </a>
-                      ),
-                    }}
-                  >
-                    {msg.content}
-                  </ReactMarkdown>
-                </div>
-              ) : (
-                <p style={{ marginBottom: 0 }}>{msg.content}</p>
-              )}
+              <div
+                style={{
+                  maxWidth: "75%",
+                  padding: "15px",
+                  borderRadius: "12px",
+                  background: msg.role === "USER" ? "#dce8ff" : "#f1f1f1",
+                  whiteSpace: "pre-wrap",
+                  lineHeight: "1.6",
+                  overflowWrap: "anywhere",
+                }}
+              >
+                <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
+                {msg.role === "ASSISTANT" ? (
+                  <div className="markdown-content">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        a: ({ href, children }) => (
+                          <a href={href} target="_blank" rel="noopener noreferrer">
+                            {children}
+                          </a>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <p style={{ marginBottom: 0 }}>{msg.content}</p>
+                )}
+              </div>
             </div>
           ))
         )}
