@@ -4,7 +4,7 @@ import { useState, type ComponentProps, type KeyboardEvent } from "react";
 
 import TextField from "./TextField";
 
-type PasswordFieldProps = Omit<ComponentProps<typeof TextField>, "type" | "rightSlot" | "onClear">;
+type PasswordFieldProps = Omit<ComponentProps<typeof TextField>, "type" | "rightSlot">;
 
 export default function PasswordField({ message, onKeyUp, ...rest }: PasswordFieldProps) {
   const [isVisible, setIsVisible] = useState(false);
