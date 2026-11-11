@@ -6,116 +6,243 @@ import {
   useEffect,
   useRef,
   useState,
-  useSyncExternalStore,
+  useCallback,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import type { BoardPost } from "@/types/board";
-import { mockPosts, mockComments } from "@/lib/board/mock-data";
-import { parsePosts, STORAGE_KEY, commentCount } from "@/lib/board/logic";
+import type { PostInput } from "@/lib/board/logic";
 
-type BoardState = {
+type User = {
+  id: string;
+  name: string;
+};
+
+type Action =
+  | {
+      action: "createPost";
+      values: PostInput;
+    }
+  | {
+      action: "updatePost";
+      postId: string;
+      values: PostInput;
+    }
+  | {
+      action: "deletePost" | "viewPost";
+      postId: string;
+    }
+  | {
+      action: "setLike";
+      postId: string;
+      liked: boolean;
+    }
+  | {
+      action: "addComment";
+      postId: string;
+      content: string;
+      parentId?: string;
+    }
+  | {
+      action: "editComment";
+      postId: string;
+      commentId: string;
+      content: string;
+    }
+  | {
+      action: "deleteComment";
+      postId: string;
+      commentId: string;
+    };
+
+type State = {
   posts: BoardPost[];
-  commit: (change: (posts: BoardPost[]) => BoardPost[]) => boolean;
+  user: User | null;
+  busy: boolean;
+  mutate: (action: Action) => Promise<string | null>;
   notify: (message: string) => void;
 };
 
-const Context = createContext<BoardState | null>(null);
+async function fetchBoard() {
+  const response = await fetch("/api/board", {
+    cache: "no-store",
+  });
 
-const subscribe = () => () => {};
-const getClientSnapshot = () => true;
-const getServerSnapshot = () => false;
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "게시판 조회 실패");
+  }
+
+  return data as {
+    posts: BoardPost[];
+    user: User;
+  };
+}
+
+const Context = createContext<State | null>(null);
 
 export function useBoard() {
-  const value = useContext(Context);
-  if (!value) throw new Error("BoardProvider가 필요합니다.");
-  return value;
+  const state = useContext(Context);
+
+  if (!state) {
+    throw new Error("BoardProvider가 필요합니다.");
+  }
+
+  return state;
 }
 
 export default function BoardProvider({ children }: { children: ReactNode }) {
-  const isClient = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const path = usePathname();
 
-  if (!isClient) {
-    return (
-      <main className="board-main" role="status">
-        게시판을 불러오는 중이에요…
-      </main>
-    );
-  }
+  const isBoard = path === "/posts" || path.startsWith("/posts/");
 
-  return <ClientBoardProvider>{children}</ClientBoardProvider>;
-}
-
-function ClientBoardProvider({ children }: { children: ReactNode }) {
-  const [initial] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-
-      const posts: BoardPost[] = saved
-        ? parsePosts(saved)
-        : mockPosts.map((p) => {
-            const comments = p.id === "1" ? structuredClone(mockComments) : [];
-
-            return {
-              ...p,
-              comments,
-              commentCount: commentCount(comments),
-              liked: false,
-            };
-          });
-
-      return { posts, error: "" };
-    } catch (e) {
-      return {
-        posts: [] as BoardPost[],
-        error: e instanceof Error ? e.message : "저장 데이터를 불러올 수 없어요.",
-      };
-    }
-  });
-
-  const [posts, setPosts] = useState<BoardPost[]>(initial.posts);
+  const [posts, setPosts] = useState<BoardPost[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const latest = useRef<BoardPost[]>(initial.posts);
+  const [busy, setBusy] = useState(false);
+
+  const inFlight = useRef(false);
+
+  const refresh = useCallback(async () => {
+    const data = await fetchBoard();
+
+    setPosts(data.posts);
+    setUser(data.user);
+  }, []);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await refresh();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "게시판 조회 실패");
+    } finally {
+      setLoading(false);
+    }
+  }, [refresh]);
+
+  useEffect(() => {
+    if (!isBoard) return;
+
+    let active = true;
+
+    void fetchBoard()
+      .then((data) => {
+        if (!active) return;
+
+        setPosts(data.posts);
+        setUser(data.user);
+        setError("");
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+
+        setError(error instanceof Error ? error.message : "게시판 조회 실패");
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [isBoard]);
 
   useEffect(() => {
     if (!notice) return;
 
     const timer = setTimeout(() => setNotice(""), 5000);
+
     return () => clearTimeout(timer);
   }, [notice]);
 
-  function commit(change: (posts: BoardPost[]) => BoardPost[]) {
-    try {
-      const next = change(latest.current);
+  const mutate = useCallback(
+    async (action: Action) => {
+      if (inFlight.current) {
+        setNotice("이전 요청 처리 후 다시 시도해 주세요.");
+        return null;
+      }
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      latest.current = next;
-      setPosts(next);
+      inFlight.current = true;
+      setBusy(true);
 
-      return true;
-    } catch (e) {
-      setNotice(e instanceof Error ? e.message : "저장하지 못했어요. 저장 공간을 확인해 주세요.");
-      return false;
-    }
-  }
+      try {
+        const response = await fetch("/api/board", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(action),
+        });
 
-  if (initial.error) {
-    return (
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "저장 실패");
+        }
+
+        try {
+          await refresh();
+          setError("");
+        } catch {
+          setError("DB 저장은 완료됐지만 화면 갱신에 실패했습니다. 다시 불러와 주세요.");
+        }
+
+        return data.postId as string;
+      } catch (error) {
+        setNotice(error instanceof Error ? error.message : "저장하지 못했어요.");
+
+        return null;
+      } finally {
+        inFlight.current = false;
+        setBusy(false);
+      }
+    },
+    [refresh],
+  );
+
+  let content = children;
+
+  if (isBoard && loading) {
+    content = (
+      <main className="board-main" role="status">
+        DB에서 게시글을 불러오는 중이에요…
+      </main>
+    );
+  } else if (isBoard && error) {
+    content = (
       <main className="board-main">
-        <h1>저장 데이터를 확인해 주세요</h1>
-        <p role="alert">{initial.error}</p>
-        <p>기존 데이터는 덮어쓰지 않았어요. README의 복구 안내를 확인해 주세요.</p>
-        <button onClick={() => location.reload()}>다시 시도</button>
+        <h1>게시판 연결 확인</h1>
+        <p role="alert">{error}</p>
+
+        <button onClick={() => void load()}>다시 불러오기</button>
       </main>
     );
   }
 
   return (
-    <Context.Provider value={{ posts, commit, notify: setNotice }}>
-      {children}
+    <Context.Provider
+      value={{
+        posts,
+        user,
+        busy,
+        mutate,
+        notify: setNotice,
+      }}
+    >
+      {content}
 
       {notice && (
         <div className="board-toast" role="status">
           {notice}
+
           <button aria-label="알림 닫기" onClick={() => setNotice("")}>
             ×
           </button>

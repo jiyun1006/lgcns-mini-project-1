@@ -16,23 +16,19 @@ export default function BoardHeader() {
         <Link href="/posts" className="brand">
           [서비스명]
         </Link>
-
         <nav aria-label="주 메뉴">
           <Link href="/posts" aria-current={isCommunity ? "page" : undefined}>
             커뮤니티
           </Link>
-
           <Link href="/chatting" aria-current={isChatting ? "page" : undefined}>
             AI 채팅
           </Link>
         </nav>
-
         {isCommunity && (
           <Link href="/posts/new" className="button primary">
             글쓰기
           </Link>
         )}
-
         <Link
           href="/myPage"
           className="avatar"

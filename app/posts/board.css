@@ -517,9 +517,6 @@
   font-size: 11px;
 }
 @media (max-width: 600px) {
-  .board-header .avatar {
-    display: none;
-  }
   .board-header nav {
     gap: 2px;
   }
