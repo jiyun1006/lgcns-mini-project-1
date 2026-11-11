@@ -17,12 +17,15 @@ datasource db {
 // 🔐 회원 (인증 방식 확정 후 필드 추가 가능)
 // ─────────────────────────────
 model User {
-  id            String         @id @default(auto()) @map("_id") @db.ObjectId
-  email         String         @unique
-  name          String
-  password      String?        // 소셜 로그인 유저는 비밀번호 없음
-  interests     String[]       @default([]) // 관심사 태그 (강사님 API는 안 받아서 우리 Mongo에)
-  createdAt     DateTime       @default(now())
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  email           String   @unique
+  name            String
+  // shortcut: 기존 유저 loginId 채우기(scripts/backfill-login-id.mjs) 전이라 선택 필드, 채운 뒤 String @unique로 변경
+  loginId         String? // 아이디 (사용자에게 보이는 이름)
+  profileImageUrl String? // 프로필 사진 URL (선택)
+  password        String? // 소셜 로그인 유저는 비밀번호 없음
+  interests       String[] @default([]) // 관심사 태그 (강사님 API는 안 받아서 우리 Mongo에)
+  createdAt       DateTime @default(now())
 
   conversations Conversation[]
   posts         Post[]

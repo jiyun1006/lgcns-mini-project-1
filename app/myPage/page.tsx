@@ -10,10 +10,9 @@ async function MyPageContent() {
     <MyPageTemplate
       user={{
         nickname: user.name,
-        // shortcut: User 스키마에 loginId·profileImageUrl이 없어 비워 둠, 필드 추가 후 연결
-        loginId: "",
+        loginId: user.loginId ?? "",
         email: user.email,
-        profileImageUrl: null,
+        profileImageUrl: user.profileImageUrl,
       }}
     />
   );
