@@ -1,4 +1,6 @@
 import type { ChatMessage } from "@/types/chat";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type ChatMessagesProps = {
   messages: ChatMessage[];
@@ -63,7 +65,24 @@ export default function ChatMessages({
               }}
             >
               <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
-              <p style={{ marginBottom: 0 }}>{msg.content}</p>
+              {msg.role === "ASSISTANT" ? (
+                <div className="markdown-content">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      a: ({ href, children }) => (
+                        <a href={href} target="_blank" rel="noopener noreferrer">
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <p style={{ marginBottom: 0 }}>{msg.content}</p>
+              )}
             </div>
           </div>
         ))
