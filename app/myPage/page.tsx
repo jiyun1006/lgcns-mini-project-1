@@ -17,6 +17,7 @@ async function MyPageContent() {
         nickname: user.name,
         loginId: user.loginId ?? "",
         email: user.email,
+        recoveryEmail: user.recoveryEmail ?? "",
         profileImageUrl,
         bio: user.bio ?? "",
         interests: user.interests,
