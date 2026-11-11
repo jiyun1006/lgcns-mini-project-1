@@ -1,63 +1,70 @@
 "use client";
+
 import { useState, type FormEvent } from "react";
 import type { BoardPost, BoardComment } from "@/types/board";
-import { USER, commentCount, editComments } from "@/lib/board/logic";
 import { useBoard } from "./BoardProvider";
+
 export default function Comments({ post }: { post: BoardPost }) {
-  const { commit } = useBoard();
+  const { mutate, user, busy } = useBoard();
+
   const [text, setText] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [edit, setEdit] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
-  function change(fn: (comments: BoardComment[]) => BoardComment[]) {
-    return commit((posts) =>
-      posts.map((p) => {
-        if (p.id !== post.id) return p;
-        const comments = fn(p.comments || []);
-        return { ...p, comments, commentCount: commentCount(comments) };
-      }),
-    );
-  }
-  function add(e: FormEvent, parentId?: string) {
+
+  async function add(e: FormEvent, parentId?: string) {
     e.preventDefault();
+
     const content = (parentId ? reply : text).trim();
-    const ok = change((comments) => {
-      if (!content || content.length > 2000) throw new Error("댓글은 1~2,000자로 입력해 주세요.");
-      const item = { id: crypto.randomUUID(), author: USER, content, replies: [] };
-      if (!parentId) return [...comments, item];
-      if (!comments.some((c) => c.id === parentId)) throw new Error("원래 댓글을 찾지 못했어요.");
-      return comments.map((c) => (c.id === parentId ? { ...c, replies: [...c.replies, item] } : c));
+
+    const saved = await mutate({
+      action: "addComment",
+      postId: post.id,
+      content,
+      parentId,
     });
-    if (ok) {
-      if (parentId) {
-        setReply("");
-        setReplyTo(null);
-      } else setText("");
+
+    if (!saved) return;
+
+    if (parentId) {
+      setReply("");
+      setReplyTo(null);
+    } else {
+      setText("");
     }
   }
-  function render(c: BoardComment, isReply = false) {
+
+  function render(comment: BoardComment, isReply = false) {
     return (
-      <div className={isReply ? "reply" : "comment"} key={c.id}>
+      <div className={isReply ? "reply" : "comment"} key={comment.id}>
         <div className="section-heading">
           <strong>
             {isReply ? "↳ " : ""}
-            {c.author}
+            {comment.author}
           </strong>
-          {c.author === USER && !c.deleted && (
+
+          {comment.authorId === user?.id && !comment.deleted && (
             <div className="actions">
               <button
                 onClick={() => {
-                  setEdit(c.id);
-                  setEditText(c.content);
+                  setEdit(comment.id);
+                  setEditText(comment.content);
                 }}
               >
                 수정
               </button>
+
               <button
-                onClick={() => {
-                  if (confirm("댓글을 삭제할까요?"))
-                    change((list) => editComments(list, c.id, null));
+                disabled={busy}
+                onClick={async () => {
+                  if (!confirm("댓글을 삭제할까요?")) return;
+
+                  await mutate({
+                    action: "deleteComment",
+                    postId: post.id,
+                    commentId: comment.id,
+                  });
                 }}
               >
                 삭제
@@ -65,11 +72,22 @@ export default function Comments({ post }: { post: BoardPost }) {
             </div>
           )}
         </div>
-        {edit === c.id ? (
+
+        {edit === comment.id ? (
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              if (change((list) => editComments(list, c.id, editText))) setEdit(null);
+
+              const saved = await mutate({
+                action: "editComment",
+                postId: post.id,
+                commentId: comment.id,
+                content: editText,
+              });
+
+              if (saved) {
+                setEdit(null);
+              }
             }}
           >
             <textarea
@@ -79,26 +97,34 @@ export default function Comments({ post }: { post: BoardPost }) {
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
             />
+
             <button type="button" onClick={() => setEdit(null)}>
               취소
             </button>
-            <button className="primary">저장</button>
+
+            <button className="primary" disabled={busy}>
+              저장
+            </button>
           </form>
         ) : (
-          <p className="preserve-lines">{c.deleted ? "삭제된 댓글이에요." : c.content}</p>
+          <p className="preserve-lines">
+            {comment.deleted ? "삭제된 댓글이에요." : comment.content}
+          </p>
         )}
+
         {!isReply && (
           <>
             <button
               onClick={() => {
-                setReplyTo(replyTo === c.id ? null : c.id);
+                setReplyTo(replyTo === comment.id ? null : comment.id);
                 setReply("");
               }}
             >
               답글 달기
             </button>
-            {replyTo === c.id && (
-              <form onSubmit={(e) => add(e, c.id)}>
+
+            {replyTo === comment.id && (
+              <form onSubmit={(e) => add(e, comment.id)}>
                 <textarea
                   aria-label="답글 쓰기"
                   required
@@ -106,20 +132,27 @@ export default function Comments({ post }: { post: BoardPost }) {
                   value={reply}
                   onChange={(e) => setReply(e.target.value)}
                 />
-                <button className="primary">답글 등록</button>
+
+                <button className="primary" disabled={busy}>
+                  답글 등록
+                </button>
               </form>
             )}
-            {c.replies.map((child) => render(child, true))}
+
+            {comment.replies.map((child) => render(child, true))}
           </>
         )}
       </div>
     );
   }
+
   return (
     <section className="comments">
       <h2>댓글 {post.commentCount}</h2>
+
       <form onSubmit={(e) => add(e)}>
         <label htmlFor="comment">댓글 쓰기</label>
+
         <textarea
           id="comment"
           required
@@ -128,11 +161,15 @@ export default function Comments({ post }: { post: BoardPost }) {
           onChange={(e) => setText(e.target.value)}
           placeholder="댓글을 남겨 보세요"
         />
+
         <div className="form-actions">
-          <button className="primary">댓글 등록</button>
+          <button className="primary" disabled={busy}>
+            댓글 등록
+          </button>
         </div>
       </form>
-      {(post.comments || []).map((c) => render(c))}
+
+      {(post.comments || []).map((comment) => render(comment))}
     </section>
   );
 }

@@ -2,11 +2,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useBoard } from "./BoardProvider";
-import { USER, validatePost, type PostInput } from "@/lib/board/logic";
+import { validatePost, type PostInput } from "@/lib/board/logic";
 import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
 import { categories, type BoardPost } from "@/types/board";
 export default function PostForm({ postId }: { postId?: string }) {
-  const { posts, commit } = useBoard();
+  const { posts, user, mutate, busy } = useBoard();
   const post = posts.find((p) => p.id === postId);
   if (postId && !post)
     return (
@@ -15,21 +15,23 @@ export default function PostForm({ postId }: { postId?: string }) {
         <Link href="/posts">목록으로</Link>
       </main>
     );
-  if (post && post.author !== USER)
+  if (post && post.authorId !== user?.id)
     return (
       <main className="board-main">
         <h1>본인의 게시글만 수정할 수 있어요</h1>
         <Link href={`/posts/${post.id}`}>게시글로 돌아가기</Link>
       </main>
     );
-  return <Editor key={postId || "new"} post={post} commit={commit} />;
+  return <Editor key={postId || "new"} post={post} mutate={mutate} busy={busy} />;
 }
 function Editor({
   post,
-  commit,
+  mutate,
+  busy,
 }: {
   post?: BoardPost;
-  commit: ReturnType<typeof useBoard>["commit"];
+  mutate: ReturnType<typeof useBoard>["mutate"];
+  busy: boolean;
 }) {
   const router = useRouter();
   const [dirty, setDirty] = useState(false);
@@ -56,10 +58,12 @@ function Editor({
       setTagInput("");
     }
   }
-  function submit(e: FormEvent<HTMLFormElement>) {
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     const data = new FormData(e.currentTarget);
     const pending = tagInput.trim().replace(/^#+/, "");
+
     const values: PostInput = {
       category: data.get("category") as BoardPost["category"],
       title: String(data.get("title") || "").trim(),
@@ -68,35 +72,29 @@ function Editor({
       result: String(data.get("result") || ""),
       tags: [...new Set([...tags, ...(pending ? [pending] : [])])],
     };
+
     try {
       validatePost(values);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "입력값을 확인해 주세요.");
+
       return;
     }
-    const id = post?.id || crypto.randomUUID();
-    const saved = commit((list) => {
-      if (post) {
-        const current = list.find((p) => p.id === id);
-        if (current?.author !== USER) throw new Error("본인 게시글만 수정할 수 있어요.");
-        return list.map((p) => (p.id === id ? { ...p, ...values } : p));
-      }
-      return [
-        {
-          ...values,
-          id,
-          author: USER,
-          createdAt: new Date().toISOString(),
-          viewCount: 0,
-          likeCount: 0,
-          commentCount: 0,
-          comments: [],
-          liked: false,
-        },
-        ...list,
-      ];
-    });
-    if (saved) {
+
+    const id = await mutate(
+      post
+        ? {
+            action: "updatePost",
+            postId: post.id,
+            values,
+          }
+        : {
+            action: "createPost",
+            values,
+          },
+    );
+
+    if (id) {
       setDirty(false);
       router.push(`/posts/${id}`);
     }
@@ -199,7 +197,7 @@ function Editor({
           >
             취소
           </Link>
-          <button className="primary" type="submit">
+          <button className="primary" type="submit" disabled={busy}>
             {post ? "수정하기" : "등록하기"}
           </button>
         </div>
