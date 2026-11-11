@@ -5,7 +5,7 @@ import { exaoneModel, exaoneOptions, SYSTEM_PROMPT } from "@/lib/ai";
 
 const HISTORY_LIMIT = 10; // 몇개의 채팅을 불러올지
 
-export const maxDuration = 60; // Vercel 배포 시 60초까지 허용
+export const maxDuration = 300; // Vercel 배포 시 300초까지 허용
 
 const TITLE_MAX = 40;
 
