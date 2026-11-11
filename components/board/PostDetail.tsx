@@ -5,21 +5,23 @@ import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useBoard } from "./BoardProvider";
-import { USER } from "@/lib/board/logic";
 import Comments from "./Comments";
 export default function PostDetail({ postId }: { postId: string }) {
-  const { posts, commit, notify } = useBoard();
+  const { posts, user, mutate, notify, busy } = useBoard();
   const post = posts.find((p) => p.id === postId);
   const router = useRouter();
   const viewed = useRef("");
+
   useEffect(() => {
     if (post && viewed.current !== postId) {
       viewed.current = postId;
-      commit((list) =>
-        list.map((p) => (p.id === postId ? { ...p, viewCount: p.viewCount + 1 } : p)),
-      );
+
+      void mutate({
+        action: "viewPost",
+        postId,
+      });
     }
-  }, [postId, post, commit]);
+  }, [postId, post, mutate]);
   if (!post)
     return (
       <main className="board-main narrow">
@@ -49,23 +51,25 @@ export default function PostDetail({ postId }: { postId: string }) {
           <p className="muted">
             {post.author} · {post.createdAt.slice(0, 10)} · 조회 {post.viewCount.toLocaleString()}
           </p>
-          {post.author === USER && (
+          {post.authorId === user?.id && (
             <div className="actions">
               <Link className="button" href={`/posts/${post.id}/edit`}>
                 수정
               </Link>
               <button
                 className="danger"
-                onClick={() => {
-                  if (
-                    confirm("게시글과 댓글을 삭제할까요?") &&
-                    commit((list) => {
-                      const target = list.find((p) => p.id === postId);
-                      if (target?.author !== USER) throw new Error("본인 글만 삭제할 수 있어요.");
-                      return list.filter((p) => p.id !== postId);
-                    })
-                  )
+                disabled={busy}
+                onClick={async () => {
+                  if (!confirm("게시글과 댓글을 삭제할까요?")) return;
+
+                  const deleted = await mutate({
+                    action: "deletePost",
+                    postId,
+                  });
+
+                  if (deleted) {
                     router.replace("/posts");
+                  }
                 }}
               >
                 삭제
@@ -102,14 +106,13 @@ export default function PostDetail({ postId }: { postId: string }) {
         <div className="like-area">
           <button
             aria-pressed={post.liked}
+            disabled={busy}
             onClick={() =>
-              commit((list) =>
-                list.map((p) =>
-                  p.id === postId
-                    ? { ...p, liked: !p.liked, likeCount: p.likeCount + (p.liked ? -1 : 1) }
-                    : p,
-                ),
-              )
+              void mutate({
+                action: "setLike",
+                postId,
+                liked: !post.liked,
+              })
             }
           >
             {post.liked ? "♥" : "♡"} 좋아요 {post.likeCount}
