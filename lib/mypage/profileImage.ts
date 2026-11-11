@@ -1,8 +1,8 @@
-// Vercel 함수 요청 본문 4.5MB 제한과 multipart 오버헤드를 고려해 4MB로 둔다
-export const MAX_PROFILE_IMAGE_BYTES = 4 * 1024 * 1024;
+// base64로 바뀐 사진이 HTML·RSC 응답에 두 번 실리므로(약 2.7배) Vercel 응답 한도를 고려해 1MB로 둔다
+export const MAX_PROFILE_IMAGE_BYTES = 1024 * 1024;
 export const PROFILE_IMAGE_TYPES = ["image/png", "image/jpeg"];
 export const PROFILE_IMAGE_TYPE_ERROR = "JPG, PNG 이미지만 올릴 수 있어요";
-export const PROFILE_IMAGE_SIZE_ERROR = "4MB 이하로 올려 주세요";
+export const PROFILE_IMAGE_SIZE_ERROR = "1MB 이하로 올려 주세요";
 
 const MAX_DATA_URL_LENGTH = Math.ceil((MAX_PROFILE_IMAGE_BYTES * 4) / 3) + 64;
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
