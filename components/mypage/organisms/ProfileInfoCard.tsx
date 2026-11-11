@@ -25,18 +25,23 @@ const fields = [
 export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
   const [draft, setDraft] = useState(user);
   const [isEditing, setIsEditing] = useState(false);
-  const [state, formAction, pending] = useActionState(
+  // 저장할 때마다 사진 선택 상태를 서버 값으로 되돌린다(React가 제출 후 파일 입력을 비우므로)
+  const [avatarKey, setAvatarKey] = useState(0);
+  const [errors, setErrors] = useState<ProfileFormState["errors"]>();
+  const [, formAction, pending] = useActionState(
     async (prevState: ProfileFormState, formData: FormData) => {
       const result = await updateProfile(prevState, formData);
       if (result.ok) setIsEditing(false);
+      setErrors(result.errors);
+      setAvatarKey((key) => key + 1);
       return result;
     },
     {},
   );
-  const errors = isEditing ? state.errors : undefined;
 
   const startEditing = () => {
     setDraft(user);
+    setErrors(undefined);
     setIsEditing(true);
   };
 
@@ -58,7 +63,11 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
                   key="cancel"
                   type="button"
                   variant="outline"
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => {
+                    setIsEditing(false);
+                    setErrors(undefined);
+                    setAvatarKey((key) => key + 1);
+                  }}
                 >
                   <X />
                   취소
@@ -77,7 +86,13 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
           </CardAction>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <AvatarUploader initialSrc={user.profileImageUrl} name={user.nickname} />
+          <AvatarUploader
+            key={avatarKey}
+            initialSrc={user.profileImageUrl}
+            name={user.nickname}
+            error={errors?.profileImage}
+            onSelect={() => !isEditing && startEditing()}
+          />
           {fields.map(({ key, label, type }) =>
             isEditing ? (
               <div key={key} className="grid gap-1.5">

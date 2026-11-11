@@ -2,17 +2,22 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import MyPageTemplate from "@/components/mypage/templates/MyPageTemplate";
 import { getCurrentUser } from "@/lib/current-user";
+import { prisma } from "@/lib/prisma";
 
 async function MyPageContent() {
   await connection(); // 프리렌더 때 고정되지 않고 요청마다 DB를 조회하게 한다
   const user = await getCurrentUser();
+  const { profileImageUrl } = await prisma.user.findUniqueOrThrow({
+    where: { id: user.id },
+    select: { profileImageUrl: true },
+  });
   return (
     <MyPageTemplate
       user={{
         nickname: user.name,
         loginId: user.loginId ?? "",
         email: user.email,
-        profileImageUrl: user.profileImageUrl,
+        profileImageUrl,
       }}
     />
   );

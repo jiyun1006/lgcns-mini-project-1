@@ -5,7 +5,7 @@ export interface MyPageUser {
   profileImageUrl: string | null;
 }
 
-export type ProfileField = "nickname" | "loginId" | "email";
+export type ProfileField = "nickname" | "loginId" | "email" | "profileImage";
 
 export interface ProfileFormState {
   ok?: boolean;

@@ -4,6 +4,11 @@ import { Prisma } from "@prisma/client";
 import { refresh } from "next/cache";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import {
+  MAX_PROFILE_IMAGE_BYTES,
+  PROFILE_IMAGE_SIZE_ERROR,
+  toProfileImageDataUrl,
+} from "@/lib/mypage/profileImage";
 import type { ProfileField, ProfileFormState } from "@/types/mypage";
 
 const LOGIN_ID_PATTERN = /^[a-z0-9_]{1,20}$/;
@@ -34,6 +39,18 @@ export async function updateProfile(
   if (!email) errors.email = "이메일은 공백만으로 저장할 수 없습니다.";
   else if (email.length > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.test(email))
     errors.email = "올바른 이메일 형식이 아닙니다.";
+
+  // 파일이 없으면 사진은 그대로 둔다. 문자열(외부 URL 등)은 받지 않는다.
+  let profileImageUrl: string | undefined;
+  const image = formData.get("profileImage");
+  if (image instanceof Blob && image.size > 0) {
+    if (image.size > MAX_PROFILE_IMAGE_BYTES) errors.profileImage = PROFILE_IMAGE_SIZE_ERROR;
+    else {
+      const result = toProfileImageDataUrl(new Uint8Array(await image.arrayBuffer()));
+      if ("error" in result) errors.profileImage = result.error;
+      else profileImageUrl = result.dataUrl;
+    }
+  }
   if (Object.keys(errors).length) return { errors };
 
   const user = await getCurrentUser();
@@ -48,7 +65,7 @@ export async function updateProfile(
   try {
     await prisma.user.update({
       where: { id: user.id },
-      data: { name: nickname, loginId, email },
+      data: { name: nickname, loginId, email, profileImageUrl },
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
