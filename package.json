@@ -13,11 +13,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.90",
     "@prisma/client": "^6.19.3",
+    "ai": "^7.0.169",
     "mongodb": "^7.8.0",
     "next": "16.4.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "zod": "^4.6.7"
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
   },
