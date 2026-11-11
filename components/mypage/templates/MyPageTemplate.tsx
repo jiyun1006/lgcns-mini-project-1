@@ -1,3 +1,4 @@
+import AccountCard from "@/components/mypage/organisms/AccountCard";
 import PasswordChangeCard from "@/components/mypage/organisms/PasswordChangeCard";
 import ProfileInfoCard from "@/components/mypage/organisms/ProfileInfoCard";
 import type { MyPageUser } from "@/types/mypage";
@@ -9,6 +10,7 @@ export default function MyPageTemplate({ user }: { user: MyPageUser }) {
         <h1 className="text-xl font-bold">마이페이지</h1>
         <ProfileInfoCard user={user} />
         <PasswordChangeCard />
+        <AccountCard />
       </div>
     </div>
   );
