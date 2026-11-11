@@ -13,10 +13,13 @@ export interface BoardPost {
   viewCount: number;
   likeCount: number;
   commentCount: number;
+  comments?: BoardComment[];
+  liked?: boolean;
 }
 export interface BoardComment {
   id: string;
   author: string;
   content: string;
   replies: BoardComment[];
+  deleted?: boolean;
 }
