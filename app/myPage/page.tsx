@@ -1,10 +1,30 @@
+import { Suspense } from "react";
+import { connection } from "next/server";
 import MyPageTemplate from "@/components/mypage/templates/MyPageTemplate";
-import { mockUser } from "@/lib/mypage/mockUser";
+import { getCurrentUser } from "@/lib/current-user";
+
+async function MyPageContent() {
+  await connection(); // 프리렌더 때 고정되지 않고 요청마다 DB를 조회하게 한다
+  const user = await getCurrentUser();
+  return (
+    <MyPageTemplate
+      user={{
+        nickname: user.name,
+        // shortcut: User 스키마에 loginId·profileImageUrl이 없어 비워 둠, 필드 추가 후 연결
+        loginId: "",
+        email: user.email,
+        profileImageUrl: null,
+      }}
+    />
+  );
+}
 
 export default function myPage() {
   return (
     <main className="flex flex-1 flex-col">
-      <MyPageTemplate user={mockUser} />
+      <Suspense>
+        <MyPageContent />
+      </Suspense>
       {/*section 내 프로필 기본 정보 (미구현)
     외부 프로필 링크 URL 입력 추가 버튼 추가되면 direction할 수 있도록
     */}
