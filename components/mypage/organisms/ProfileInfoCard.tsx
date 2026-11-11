@@ -96,6 +96,8 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
                 label={label}
                 type={type}
                 required
+                aria-invalid={!!error || undefined}
+                aria-describedby={error ? "profile-error" : undefined}
                 value={draft[key]}
                 onChange={(event) => setDraft({ ...draft, [key]: event.target.value })}
               />
@@ -107,7 +109,7 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
             ),
           )}
           {isEditing && error && (
-            <p role="alert" className="text-sm text-destructive">
+            <p id="profile-error" role="alert" className="text-sm text-destructive">
               {error}
             </p>
           )}

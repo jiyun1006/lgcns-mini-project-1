@@ -55,12 +55,15 @@ export default function PasswordChangeCard() {
               label={label}
               type="password"
               autoComplete={autoComplete}
+              aria-invalid={message?.isError || undefined}
+              aria-describedby={message?.isError ? "password-message" : undefined}
               value={form[key]}
               onChange={(event) => setForm({ ...form, [key]: event.target.value })}
             />
           ))}
           {message && (
             <p
+              id="password-message"
               role={message.isError ? "alert" : "status"}
               className={message.isError ? "text-sm text-destructive" : "text-sm text-green-700"}
             >
