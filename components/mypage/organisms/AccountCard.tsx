@@ -10,7 +10,7 @@ export default function AccountCard() {
 
   const handleLogout = () => {
     // shortcut: 인증 미구현이라 리다이렉트만 함, part/auth 토큰 작업 후 토큰 삭제 추가
-    router.push("/login");
+    router.replace("/login");
   };
 
   return (
