@@ -18,6 +18,8 @@ async function SearchResults({
 }) {
   const { q: raw } = await searchParams;
   const q = typeof raw === "string" ? raw.trim().slice(0, MAX_QUERY_LENGTH) : "";
+  // MongoDB에서 insensitive contains는 정규식으로 바뀌므로 특수문자를 글자 그대로 찾게 이스케이프한다
+  const pattern = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // 목록에는 이름·아이디만 읽는다(사진·비밀번호 등은 select하지 않음)
   const users = q
@@ -25,8 +27,8 @@ async function SearchResults({
         where: {
           loginId: { isSet: true, not: null },
           OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { loginId: { contains: q, mode: "insensitive" } },
+            { name: { contains: pattern, mode: "insensitive" } },
+            { loginId: { contains: pattern, mode: "insensitive" } },
           ],
         },
         select: { id: true, name: true, loginId: true },
