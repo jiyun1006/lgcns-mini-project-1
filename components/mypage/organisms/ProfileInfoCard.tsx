@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useActionState, useState } from "react";
 import { Pencil, Save, User, X } from "lucide-react";
 import { MyPageButton } from "@/components/mypage/atoms/MyPageButton";
 import {
@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/card";
 import AvatarUploader from "@/components/mypage/molecules/AvatarUploader";
 import FormField from "@/components/mypage/molecules/FormField";
-import type { MyPageUser } from "@/types/mypage";
+import { updateProfile } from "@/app/myPage/actions";
+import type { MyPageUser, ProfileFormState } from "@/types/mypage";
 
 const fields = [
   { key: "nickname", label: "닉네임", type: "text" },
@@ -22,42 +23,26 @@ const fields = [
 ] as const;
 
 export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
-  const [profile, setProfile] = useState(user);
   const [draft, setDraft] = useState(user);
   const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [state, formAction, pending] = useActionState(
+    async (prevState: ProfileFormState, formData: FormData) => {
+      const result = await updateProfile(prevState, formData);
+      if (result.ok) setIsEditing(false);
+      return result;
+    },
+    {},
+  );
+  const errors = isEditing ? state.errors : undefined;
 
   const startEditing = () => {
-    setDraft(profile);
+    setDraft(user);
     setIsEditing(true);
-  };
-
-  const cancelEditing = () => {
-    setError(null);
-    setIsEditing(false);
-  };
-
-  // shortcut: 로컬 state에만 저장함, 프로필 수정 API가 생기면 여기서 호출
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = {
-      ...draft,
-      nickname: draft.nickname.trim(),
-      loginId: draft.loginId.trim(),
-      email: draft.email.trim(),
-    };
-    if (!trimmed.nickname || !trimmed.loginId || !trimmed.email) {
-      setError("닉네임, 아이디, 이메일은 공백만으로 저장할 수 없습니다.");
-      return;
-    }
-    setProfile(trimmed);
-    setError(null);
-    setIsEditing(false);
   };
 
   return (
     <Card>
-      <form onSubmit={handleSave} className="contents">
+      <form action={formAction} noValidate className="contents">
         <CardHeader className="border-b">
           <CardTitle className="flex items-center gap-2 font-bold text-stone-900">
             <span className="flex size-8 items-center justify-center rounded-xl bg-board-accent-soft text-board-accent">
@@ -69,11 +54,16 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
           <CardAction className="flex gap-2">
             {isEditing ? (
               <>
-                <MyPageButton key="cancel" type="button" variant="outline" onClick={cancelEditing}>
+                <MyPageButton
+                  key="cancel"
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                >
                   <X />
                   취소
                 </MyPageButton>
-                <MyPageButton key="save" type="submit">
+                <MyPageButton key="save" type="submit" disabled={pending}>
                   <Save />
                   저장
                 </MyPageButton>
@@ -87,31 +77,32 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
           </CardAction>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <AvatarUploader initialSrc={profile.profileImageUrl} name={profile.nickname} />
+          <AvatarUploader initialSrc={user.profileImageUrl} name={user.nickname} />
           {fields.map(({ key, label, type }) =>
             isEditing ? (
-              <FormField
-                key={key}
-                id={key}
-                label={label}
-                type={type}
-                required
-                aria-invalid={!!error || undefined}
-                aria-describedby={error ? "profile-error" : undefined}
-                value={draft[key]}
-                onChange={(event) => setDraft({ ...draft, [key]: event.target.value })}
-              />
+              <div key={key} className="grid gap-1.5">
+                <FormField
+                  id={key}
+                  label={label}
+                  type={type}
+                  required
+                  aria-invalid={!!errors?.[key] || undefined}
+                  aria-describedby={errors?.[key] ? `${key}-error` : undefined}
+                  value={draft[key]}
+                  onChange={(event) => setDraft({ ...draft, [key]: event.target.value })}
+                />
+                {errors?.[key] && (
+                  <p id={`${key}-error`} role="alert" className="text-sm text-destructive">
+                    {errors[key]}
+                  </p>
+                )}
+              </div>
             ) : (
               <div key={key} className="grid gap-1.5">
                 <span className="text-xs font-medium text-stone-500">{label}</span>
-                <span className="text-sm text-stone-900">{profile[key]}</span>
+                <span className="text-sm text-stone-900">{user[key]}</span>
               </div>
             ),
-          )}
-          {isEditing && error && (
-            <p id="profile-error" role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
           )}
         </CardContent>
       </form>
