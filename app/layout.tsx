@@ -5,6 +5,7 @@ import BoardProvider from "@/components/board/BoardProvider";
 import AuthShell from "@/components/providers/AuthShell";
 import "./globals.css";
 import "./posts/board.css";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,10 +26,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Suspense fallback={null}>
-          <AuthShell>
-            <BoardProvider>{children}</BoardProvider>
-          </AuthShell>
+        <Suspense fallback={<div role="status">화면을 불러오는 중이에요…</div>}>
+          <BoardProvider>{children}</BoardProvider>
         </Suspense>
       </body>
     </html>

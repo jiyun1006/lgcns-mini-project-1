@@ -203,7 +203,7 @@ export default function ChatPage() {
       style={{
         display: "flex",
         width: "100%",
-        height: "100dvh",
+        height: "100d%",
         overflow: "hidden",
         fontFamily: "Arial, sans-serif",
         color: "#222",
@@ -218,6 +218,7 @@ export default function ChatPage() {
           onSelect={selectConversation}
           onRename={renameConversation}
           onDelete={deleteConversation}
+          onToggle={() => setSidebarOpen(false)}
         />
       )}
 
@@ -240,23 +241,25 @@ export default function ChatPage() {
             gap: "14px",
           }}
         >
-          <button
-            type="button"
-            onClick={() => setSidebarOpen((open) => !open)}
-            aria-label={sidebarOpen ? "사이드바 닫기" : "사이드바 열기"}
-            title={sidebarOpen ? "사이드바 닫기" : "사이드바 열기"}
-            style={{
-              width: "40px",
-              height: "40px",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              background: "#fff",
-              cursor: "pointer",
-              fontSize: "20px",
-            }}
-          >
-            ☰
-          </button>
+          {!sidebarOpen && (
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="사이드바 열기"
+              title="사이드바 열기"
+              style={{
+                width: "40px",
+                height: "40px",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                background: "#fff",
+                cursor: "pointer",
+                fontSize: "20px",
+              }}
+            >
+              ☰
+            </button>
+          )}
           <h3 style={{ margin: 0, fontSize: "17px", fontWeight: 600 }}>{activeTitle}</h3>
         </header>
 
