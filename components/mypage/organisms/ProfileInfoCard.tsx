@@ -25,6 +25,7 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
   const [profile, setProfile] = useState(user);
   const [draft, setDraft] = useState(user);
   const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const startEditing = () => {
     setDraft(profile);
@@ -34,12 +35,18 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
   // shortcut: 로컬 state에만 저장함, 프로필 수정 API가 생기면 여기서 호출
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setProfile({
+    const trimmed = {
       ...draft,
       nickname: draft.nickname.trim(),
       loginId: draft.loginId.trim(),
       email: draft.email.trim(),
-    });
+    };
+    if (!trimmed.nickname || !trimmed.loginId || !trimmed.email) {
+      setError("닉네임, 아이디, 이메일은 공백만으로 저장할 수 없습니다.");
+      return;
+    }
+    setProfile(trimmed);
+    setError(null);
     setIsEditing(false);
   };
 
@@ -87,6 +94,11 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
                 <span className="text-sm text-stone-900">{profile[key]}</span>
               </div>
             ),
+          )}
+          {isEditing && error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
           )}
         </CardContent>
       </form>
