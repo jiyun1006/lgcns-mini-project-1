@@ -1,21 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChatMessage, Conversation } from "@/types/chat";
 import ChatSidebar from "@/components/chat/ChatSidebar";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatInput from "@/components/chat/ChatInput";
 
-export default function ChatPage() {
+export default function ChatPage({ initialId }: { initialId: string | null }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState("");
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState("");
+
+  // 스트리밍 중인 대화의 메시지를 따로 보관 (다른 채팅에 갔다 와도 이어서 보이도록)
+  const activeIdRef = useRef<string | null>(null);
+  const streamRef = useRef<{ conversationId: string; messages: ChatMessage[] } | null>(null);
+  useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
 
   // 최근 대화 목록 조회
   const loadConversations = async () => {
@@ -39,7 +48,12 @@ export default function ChatPage() {
 
     const data = (await response.json()) as Conversation;
     setActiveId(data.id);
-    setMessages(data.messages ?? []);
+    window.history.replaceState(null, "", `/chatting?id=${data.id}`);
+    setEditingMessageId(null);
+    setEditingContent("");
+    // 이 대화가 아직 답변 중이면 DB 대신 스트리밍 중인 메시지를 보여줌
+    const stream = streamRef.current;
+    setMessages(stream?.conversationId === data.id ? stream.messages : (data.messages ?? []));
   };
 
   // 새로운 대화 생성
@@ -50,8 +64,11 @@ export default function ChatPage() {
     const data = (await response.json()) as Conversation;
     setConversations((prev) => [data, ...prev]);
     setActiveId(data.id);
+    window.history.replaceState(null, "", `/chatting?id=${data.id}`);
     setMessages([]);
     setQuestion("");
+    setEditingMessageId(null);
+    setEditingContent("");
     setError("");
 
     return data.id;
@@ -116,19 +133,22 @@ export default function ChatPage() {
     }
   };
 
-  // 질문 전송
-  const askQuestion = async (text: string) => {
+  // 질문 전송 및 기존 질문 수정 후 재생성
+  const sendQuestion = async (text: string, editMessageId?: string) => {
     if (!text.trim() || loading) return;
+
+    const trimmedText = text.trim();
+    const conversationId = activeId;
+    if (editMessageId && !conversationId) return;
 
     setLoading(true);
     setError("");
 
-    // 화면에 먼저 보여줄 임시 메시지 2개
     const now = new Date().toISOString();
     const userMsg: ChatMessage = {
       id: `temp-user-${Date.now()}`,
       role: "USER",
-      content: text.trim(),
+      content: trimmedText,
       createdAt: now,
     };
     const aiMsg: ChatMessage = {
@@ -138,45 +158,96 @@ export default function ChatPage() {
       createdAt: now,
     };
 
-    try {
-      let conversationId = activeId;
-      if (!conversationId) conversationId = await createConversation();
+    let targetConversationId = conversationId;
 
-      setMessages((prev) => [...prev, userMsg, aiMsg]);
+    try {
+      if (!targetConversationId) targetConversationId = await createConversation();
+
+      const editIndex = editMessageId
+        ? messages.findIndex((message) => message.id === editMessageId)
+        : -1;
+      if (editMessageId && editIndex < 0) {
+        throw new Error("수정할 질문을 찾을 수 없습니다. 대화를 새로고침해주세요.");
+      }
+      const base = editMessageId ? messages.slice(0, editIndex) : conversationId ? messages : [];
+
+      streamRef.current = {
+        conversationId: targetConversationId,
+        messages: [...base, userMsg, aiMsg],
+      };
+      activeIdRef.current = targetConversationId;
+      setMessages(streamRef.current.messages);
       setQuestion("");
+      setEditingMessageId(null);
+      setEditingContent("");
 
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: text.trim(), conversationId }),
+        body: JSON.stringify({
+          question: trimmedText,
+          conversationId: targetConversationId,
+          ...(editMessageId ? { editMessageId } : {}),
+        }),
       });
 
-      // 스트림 시작 전 에러는 JSON으로 옴
       if (!response.ok || !response.body) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error || "답변 생성 실패");
       }
 
-      // 조각이 올 때마다 AI 메시지에 이어 붙이기
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        setMessages((prev) =>
-          prev.map((m) => (m.id === aiMsg.id ? { ...m, content: m.content + chunk } : m)),
+        const stream = streamRef.current;
+        if (!stream) break;
+        stream.messages = stream.messages.map((message) =>
+          message.id === aiMsg.id ? { ...message, content: message.content + chunk } : message,
         );
+        if (activeIdRef.current === stream.conversationId) setMessages(stream.messages);
       }
 
-      await loadConversations(); // 사이드바 제목, 순서 갱신
+      await loadConversations();
     } catch (err) {
-      // 실패하면 빈 AI 말풍선 제거
-      setMessages((prev) => prev.filter((m) => m.id !== aiMsg.id));
+      const stream = streamRef.current;
+      if (stream) {
+        stream.messages = stream.messages.filter((message) => message.id !== aiMsg.id);
+        if (activeIdRef.current === stream.conversationId) setMessages(stream.messages);
+      }
+
+      if (editMessageId && targetConversationId) {
+        const refresh = await fetch(`/api/conversations?id=${targetConversationId}`);
+        if (refresh.ok) {
+          const data = (await refresh.json()) as Conversation;
+          setMessages(data.messages ?? []);
+        }
+      }
       setError(err instanceof Error ? err.message : "오류 발생");
     } finally {
+      streamRef.current = null;
       setLoading(false);
     }
+  };
+
+  const askQuestion = (text: string) => sendQuestion(text);
+
+  const beginEdit = (message: ChatMessage) => {
+    if (loading) return;
+    setEditingMessageId(message.id);
+    setEditingContent(message.content);
+  };
+
+  const cancelEdit = () => {
+    setEditingMessageId(null);
+    setEditingContent("");
+  };
+
+  const submitEdit = () => {
+    if (!editingMessageId || !editingContent.trim() || loading) return;
+    void sendQuestion(editingContent, editingMessageId);
   };
 
   // 최초 페이지 로딩
@@ -184,7 +255,9 @@ export default function ChatPage() {
     const initialize = async () => {
       try {
         const data = await loadConversations();
-        if (data.length > 0) await selectConversation(data[0].id);
+        // 바뀐 부분: 맨 위(data[0]) 대신 URL의 id를 먼저 찾는다
+        const target = data.find((c) => c.id === initialId) ?? data[0];
+        if (target) await selectConversation(target.id);
       } catch {
         setError("서버에 연결할 수 없습니다.");
       } finally {
@@ -198,12 +271,33 @@ export default function ChatPage() {
   const activeTitle =
     conversations.find((conversation) => conversation.id === activeId)?.title ?? "새 대화";
 
+  useEffect(() => {
+    if (loading) return; // 지금 이 화면에서 스트리밍 중이면 불필요
+    const last = messages[messages.length - 1];
+    if (!activeId || last?.role !== "USER") return;
+
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries += 1;
+      if (tries > 40) return clearInterval(timer); // 최대 약 2분
+      const res = await fetch(`/api/conversations?id=${activeId}`);
+      if (!res.ok) return;
+      const data = (await res.json()) as Conversation;
+      const lastMsg = data.messages?.[data.messages.length - 1];
+      if (lastMsg?.role === "ASSISTANT") {
+        setMessages(data.messages ?? []);
+        clearInterval(timer);
+      }
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [activeId, messages, loading]);
   return (
     <main
       style={{
         display: "flex",
         width: "100%",
-        height: "100d%",
+        height: "100%",
         overflow: "hidden",
         fontFamily: "Arial, sans-serif",
         color: "#222",
@@ -268,6 +362,12 @@ export default function ChatPage() {
           initializing={initializing}
           loading={loading}
           error={error}
+          editingMessageId={editingMessageId}
+          editingContent={editingContent}
+          onEditClick={beginEdit}
+          onEditingContentChange={setEditingContent}
+          onEditCancel={cancelEdit}
+          onEditSubmit={submitEdit}
         />
 
         <ChatInput
