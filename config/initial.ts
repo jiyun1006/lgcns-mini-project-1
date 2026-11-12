@@ -1,7 +1,7 @@
 const withoutAuthUrlList = ["/login", "/signup"];
 
-const authUrlList: string[] = [];
-const authPrefixList = ["/chatting"];
+const authUrlList = ["/posts/new"];
+const authPrefixList: string[] = [];
 
 function safeCallbackPath(value: string | null | undefined) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
