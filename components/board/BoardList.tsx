@@ -44,7 +44,9 @@ export default function BoardList() {
           <Link href={`/posts/${p.id}`} className="trending-card" key={p.id}>
             <div className="section-heading">
               <strong className="rank">{i + 1}</strong>
-              <span className="badge">{p.category}</span>
+              <span className="badge" data-category={p.category}>
+                {p.category}
+              </span>
             </div>
             <h3>{p.title}</h3>
             <span className="muted">
@@ -103,7 +105,9 @@ export default function BoardList() {
             <span className="row-number">{(current - 1) * 8 + i + 1}</span>
             <div>
               <div className="post-meta">
-                <span className="badge">{p.category}</span>
+                <span className="badge" data-category={p.category}>
+                  {p.category}
+                </span>
                 <span>
                   {p.author} · {p.createdAt.slice(0, 10).replaceAll("-", ".")}
                 </span>
