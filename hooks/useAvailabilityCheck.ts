@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { FieldTone } from "@/components/molecules/TextField";
+import type { FieldTone } from "@/components/auth/molecules/TextField";
 import type { ApiResult } from "@/service/auth/authApi";
 
 export type CheckStatus = "idle" | "typing" | "invalid" | "checking" | "ok" | "taken" | "error";

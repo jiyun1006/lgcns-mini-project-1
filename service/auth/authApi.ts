@@ -1,4 +1,4 @@
-import { mockAuthApi } from "./mockAuthApi";
+import { realAuthApi } from "./realAuthApi";
 
 export type ApiResult<T = null> = { ok: true; data: T } | { ok: false; message: string };
 
@@ -20,4 +20,4 @@ export type AuthApi = {
 };
 
 // 🔌 진짜 API를 붙일 때 이 줄만 바꿔요 (mockAuthApi → realAuthApi, 6-4)
-export const authApi: AuthApi = mockAuthApi;
+export const authApi: AuthApi = realAuthApi;
