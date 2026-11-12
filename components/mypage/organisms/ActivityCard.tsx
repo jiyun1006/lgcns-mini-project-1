@@ -9,7 +9,7 @@ import { selectActivity } from "@/lib/mypage/activity";
 
 export default function ActivityCard() {
   const { posts, user } = useBoard();
-  const activity = selectActivity(posts, user?.name ?? "");
+  const activity = selectActivity(posts, user?.name ?? "", user?.id);
   const tabs = [
     {
       value: "posts",
