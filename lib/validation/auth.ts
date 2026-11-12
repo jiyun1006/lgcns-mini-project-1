@@ -39,3 +39,14 @@ export function validateNickname(value: string) {
   if (trimmed.length < 2 || trimmed.length > 12) return "닉네임은 2~12자예요.";
   return "";
 }
+
+export const LOGIN_ID_RULE = "영문 소문자·숫자·_ 1~20자 · 로그인할 때 써요";
+
+export function validateLoginId(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "아이디를 입력해 주세요.";
+  if (!/^[a-z0-9_]{1,20}$/.test(trimmed)) {
+    return "아이디는 영문 소문자, 숫자, _만 써서 20자까지 만들어 주세요.";
+  }
+  return "";
+}

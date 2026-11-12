@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import MyPageTemplate from "@/components/mypage/templates/MyPageTemplate";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -7,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 async function MyPageContent() {
   await connection(); // 프리렌더 때 고정되지 않고 요청마다 DB를 조회하게 한다
   const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
   const { profileImageUrl } = await prisma.user.findUniqueOrThrow({
     where: { id: user.id },
     select: { profileImageUrl: true },

@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LoginStatus from "@/components/auth/atoms/LoginStatus";
+import { useAuth } from "@/components/auth/providers/AuthProvider";
 
 export default function BoardHeader() {
   const path = usePathname();
+  const { isLoggedIn, name } = useAuth();
 
   const isCommunity = path === "/posts" || path.startsWith("/posts/");
   const isChatting = path === "/chatting" || path.startsWith("/chatting/");
@@ -29,14 +32,17 @@ export default function BoardHeader() {
             글쓰기
           </Link>
         )}
-        <Link
-          href="/myPage"
-          className="avatar"
-          aria-label="지혜 마이페이지"
-          aria-current={isMyPage ? "page" : undefined}
-        >
-          지
-        </Link>
+        <LoginStatus />
+        {isLoggedIn && (
+          <Link
+            href="/myPage"
+            className="avatar"
+            aria-label={`${name ?? "내"} 마이페이지`}
+            aria-current={isMyPage ? "page" : undefined}
+          >
+            {name?.slice(0, 1) ?? "나"}
+          </Link>
+        )}
       </header>
     </div>
   );
