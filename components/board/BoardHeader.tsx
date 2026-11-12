@@ -17,11 +17,8 @@ export default function BoardHeader() {
     <div className="board-shell" style={{ minHeight: "auto" }}>
       <header className="board-header">
         <Link href="/posts" className="brand" aria-label="Chat EXAONE 홈">
-          <span className="brand-copy">
-            <span className="brand-title">
-              Chat <strong>EXAONE</strong>
-            </span>
-            <span className="brand-tagline">AI CHAT / COMMUNITY</span>
+          <span className="brand-title">
+            Chat <strong>EXAONE</strong>
           </span>
         </Link>
         <nav aria-label="주 메뉴">
