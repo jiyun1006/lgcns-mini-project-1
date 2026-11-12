@@ -25,6 +25,8 @@ export interface BoardComment {
   id: string;
   author: string;
   authorId?: string;
+  authorProfileImageUrl?: string | null;
+  createdAt?: string;
   content: string;
   replies: BoardComment[];
   deleted?: boolean;
