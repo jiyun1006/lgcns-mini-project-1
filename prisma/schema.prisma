@@ -1,0 +1,127 @@
+// Prisma 6 + MongoDB
+// Source: lgcns-mjp1-team/lgcns-mini-project-1 (develop)
+// Keep the account and chat models compatible with the existing project.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// 회원
+model User {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  email           String   @unique
+  recoveryEmail   String? // 복구용 이메일 (아이디 찾기 전용, 마이페이지에서 수정. 로그인에는 안 씀)
+
+  name            String
+  // shortcut: 기존 유저 loginId 채우기(scripts/backfill-login-id.mjs) 전이라 선택 필드, 채운 뒤 String @unique로 변경
+  loginId         String? // 아이디 (사용자에게 보이는 이름)
+  profileImageUrl String? // 프로필 사진 URL (선택)
+  password        String? // 소셜 로그인 유저는 비밀번호 없음
+  interests       String[] @default([]) // 관심사 태그
+  bio             String? // 자기소개 (150자 미만)
+  // 공개 설정: 기존 문서에 없어도 읽히도록 선택 필드, 값이 없으면 공개(true)로 처리. 단 showEmail만 비공개(false)
+  isProfilePublic Boolean? // 프로필 전체 공개 여부
+  showEmail       Boolean? // 이메일 공개 여부
+  showInterests   Boolean? // 자기소개·관심사 공개 여부
+  createdAt       DateTime @default(now())
+
+  conversations Conversation[]
+  posts         Post[]
+  comments      Comment[]
+  postLikes     PostLike[]
+}
+
+// AI 채팅: 기존 모델 유지
+model Conversation {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String    @default("새 대화")
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+model Message {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  role           Role
+  content        String
+  reasoning      String?
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+enum Role {
+  USER
+  ASSISTANT
+}
+
+// 게시글
+model Post {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  category  String   @default("프롬프트 공유")
+  prompt    String   @default("")
+  result    String   @default("")
+  tags      String[] @default([])
+  viewCount Int      @default(0)
+
+  authorId String   @db.ObjectId
+  author   User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    PostLike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([category, createdAt])
+  @@index([authorId, createdAt])
+}
+
+// 댓글과 답글
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  deleted   Boolean  @default(false)
+
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String   @db.ObjectId
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // 답글은 같은 Comment 모델의 부모 댓글을 참조함.
+  // MongoDB의 Prisma 자기 참조 관계에서는 NoAction이 필요함.
+  parentId  String?   @db.ObjectId
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
+  @@index([postId, parentId])
+}
+
+// 게시글 좋아요 (사용자당 게시글 1회)
+model PostLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
