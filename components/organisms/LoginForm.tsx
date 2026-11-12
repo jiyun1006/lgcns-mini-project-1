@@ -96,6 +96,7 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
         name="password"
         label="비밀번호"
         autoComplete="current-password"
+        onClear={() => setValues((prev) => ({ ...prev, password: "" }))}
         value={values.password}
         onChange={handleChange}
         tone={errors.password || formError ? "error" : "default"}

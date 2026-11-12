@@ -22,7 +22,8 @@ export function getPasswordLevel(value: string) {
 export function validatePassword(value: string) {
   if (!value) return "비밀번호를 입력해 주세요.";
   if (value.length > 72) return "비밀번호는 72자까지 쓸 수 있어요.";
-  if (getPasswordLevel(value) < 3) return "8자 이상, 영문·숫자·특수문자를 모두 넣어 주세요.";
+  if (value.length < 8) return "비밀번호는 8자 이상이에요.";
+  if (getPasswordLevel(value) < 2) return "영문+숫자 또는 특수문자를 넣어 주세요.";
   return "";
 }
 

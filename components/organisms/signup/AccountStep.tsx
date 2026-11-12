@@ -55,6 +55,7 @@ export default function AccountStep({
         autoComplete="new-password"
         value={values.password}
         onChange={(e) => onChange("password", e.target.value)}
+        onClear={() => onChange("password", "")}
         tone={passwordError ? "error" : "default"}
         message={passwordError}
         bottomSlot={<PasswordStrength password={values.password} />}
@@ -66,6 +67,7 @@ export default function AccountStep({
         autoComplete="new-password"
         value={values.passwordConfirm}
         onChange={(e) => onChange("passwordConfirm", e.target.value)}
+        onClear={() => onChange("passwordConfirm", "")}
         tone={confirmError ? "error" : isConfirmOk ? "success" : "default"}
         message={confirmError || (isConfirmOk ? "비밀번호가 일치해요" : "")}
       />
