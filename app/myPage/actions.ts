@@ -26,7 +26,7 @@ const LOGIN_ID_PATTERN = /^[a-z0-9_]{1,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL_LENGTH = 254;
 
-// 대상은 항상 현재 사용자 본인. 클라이언트가 보낸 id는 받지 않는다.
+// 대상은 항상 현재 사용자 본인
 export async function updateProfile(
   _prevState: ProfileFormState,
   formData: FormData,
@@ -136,7 +136,7 @@ export async function updatePrivacy(
   return { ok: true };
 }
 
-// 비밀번호 변경 : 비밀번호는 강사님 Spring에만 있어서 Spring API로 바꿔요
+// 비밀번호 변경
 export async function changePassword(
   input: PasswordChangeInput,
 ): Promise<{ ok: boolean; message: string }> {

@@ -20,7 +20,7 @@ import {
 import { authApi } from "@/service/auth/authApi";
 
 export type SignupValues = {
-  terms: boolean[]; // [이용약관, 개인정보, 만 14세, 마케팅(선택)]
+  terms: boolean[];
   loginId: string;
   email: string;
   password: string;
@@ -98,7 +98,6 @@ export default function SignupForm() {
       return;
     }
 
-    // 3단계 "가입하기"
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
@@ -124,7 +123,7 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="flex w-full max-w-[520px] flex-col gap-5">
+    <div className="flex w-full max-w-130 flex-col gap-5">
       <h1 className="text-center text-[26px] font-extrabold">회원가입</h1>
       <SignupProgress current={step} />
 
@@ -134,7 +133,7 @@ export default function SignupForm() {
           void goNext();
         }}
         noValidate
-        className="flex flex-col gap-[18px] rounded-2xl border border-[#E4E4E7] bg-white p-8"
+        className="flex flex-col gap-4.5 rounded-2xl border border-[#E4E4E7] bg-white p-8"
       >
         {formError ? <Alert>{formError}</Alert> : null}
 
@@ -167,7 +166,7 @@ export default function SignupForm() {
         ) : null}
 
         {step < 4 ? (
-          <div className="flex gap-2.5 border-t border-[#F0F0F2] pt-[18px]">
+          <div className="flex gap-2.5 border-t border-[#F0F0F2] pt-4.5">
             <Button
               variant="secondary"
               onClick={goPrev}
@@ -180,7 +179,7 @@ export default function SignupForm() {
               type="submit"
               isLoading={isSubmitting}
               loadingText="가입하는 중…"
-              className="flex-[2]"
+              className="flex-2"
             >
               {step === 3 ? "가입하기" : "다음"}
             </Button>

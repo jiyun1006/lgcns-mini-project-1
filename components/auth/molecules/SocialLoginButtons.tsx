@@ -1,6 +1,5 @@
 import Button from "@/components/auth/atoms/Button";
 
-// 소셜 로그인을 붙일 때 진짜 버튼으로 바꾼다
 export default function SocialLoginButtons() {
   return (
     <div className="flex flex-col gap-2">

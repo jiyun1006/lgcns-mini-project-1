@@ -36,7 +36,7 @@ export default function TermsStep({ terms, onChange, showError }: TermsStepProps
             type="checkbox"
             checked={terms[index]}
             onChange={() => onChange(terms.map((value, i) => (i === index ? !value : value)))}
-            className="h-[18px] w-[18px] accent-[#4338CA]"
+            className="h-4.5 w-4.5 accent-[#4338CA]"
           />
           <span className={`font-bold ${term.required ? "text-[#3730A3]" : "text-[#52525B]"}`}>
             {term.required ? "(필수)" : "(선택)"}

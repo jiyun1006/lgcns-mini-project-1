@@ -22,7 +22,7 @@ model User {
   loginId         String? // 아이디 (사용자에게 보이는 이름)
   profileImageUrl String? // 프로필 사진 URL (선택)
   password        String? // 소셜 로그인 유저는 비밀번호 없음
-  interests       String[] @default([]) // 관심사 태그 (강사님 API는 안 받아서 우리 Mongo에)
+  interests       String[] @default([]) // 관심사 태그
   bio             String? // 자기소개 (150자 미만)
   // 공개 설정: 기존 문서에 없어도 읽히도록 선택 필드, 값이 없으면 공개(true)로 처리. 단 showEmail만 비공개(false)
   isProfilePublic Boolean? // 프로필 전체 공개 여부

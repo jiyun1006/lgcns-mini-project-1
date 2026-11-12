@@ -3,7 +3,6 @@
 import { useTransition } from "react";
 import { rememberReturnPath } from "@/actions/returnToActions";
 
-// 비회원에게 보여 주는 로그인 안내 말풍선. 로그인하면 지금 보던 페이지로 돌아온다
 export default function LoginRequiredNotice({ message }: { message: string }) {
   const [isPending, startTransition] = useTransition();
 

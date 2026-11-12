@@ -49,7 +49,7 @@ export default function TextField({
           value={value}
           aria-invalid={tone === "error" || undefined}
           aria-describedby={message ? messageId : undefined}
-          className="h-[46px] min-w-0 flex-1 rounded-[10px] px-[14px] text-[15px] outline-none"
+          className="h-11.5 min-w-0 flex-1 rounded-[10px] px-3.5 text-[15px] outline-none"
           {...rest}
         />
         {onClear && value ? (

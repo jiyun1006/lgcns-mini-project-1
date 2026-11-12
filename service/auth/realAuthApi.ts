@@ -33,7 +33,6 @@ export const realAuthApi: AuthApi = {
   async signup(input) {
     const result = await signupAction(input);
     if (!result.ok || result.data.needsApproval) return result;
-    // 가입 성공 → 바로 로그인 (목업: "가입 전에 보던 페이지로 돌아갈게요")
     await signIn("credentials", { email: input.email, password: input.password, redirect: false });
     return result;
   },

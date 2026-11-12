@@ -14,7 +14,6 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt", maxAge: EXPIRES_IN_SECONDS },
   pages: { signIn: "/login" },
   events: {
-    // 로그아웃하면 강사님 서버의 토큰도 못 쓰게 해요. 실패해도 우리 로그아웃은 그대로 돼요
     async signOut({ token }) {
       if (!token?.springAccessToken) return;
       await springFetch.post<null>(matchApiUrl.auth.logout, undefined, {
@@ -39,7 +38,6 @@ export const authOptions: NextAuthOptions = {
         if (!result.ok) throw new Error(result.message);
         const data = result.data;
 
-        // 🔀 Spring 회원을 팀 Mongo User에도 둔다 (있으면 그대로, 없으면 만들기)
         const upsertUser = async () =>
           prisma.user.upsert({
             where: { email: data.email },
@@ -51,7 +49,6 @@ export const authOptions: NextAuthOptions = {
             },
             select: { id: true },
           });
-        // 같은 사람이 동시에 처음 로그인하면 한쪽이 P2002(이미 있음)로 실패해요 → 한 번 더
         const mongoUser = await upsertUser().catch((error: unknown) => {
           if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
             return upsertUser();

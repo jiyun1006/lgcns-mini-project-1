@@ -21,5 +21,4 @@ export type AuthApi = {
   signup(input: SignupInput): Promise<ApiResult<{ needsApproval: boolean }>>;
 };
 
-// 🔌 진짜 API를 붙일 때 이 줄만 바꿔요 (mockAuthApi → realAuthApi, 6-4)
 export const authApi: AuthApi = realAuthApi;
