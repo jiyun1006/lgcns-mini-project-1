@@ -6,6 +6,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // 이미 가입된 척하는 목록
 const takenEmails = ["test@test.com", "admin@test.com"];
 const takenNicknames = ["관리자", "테스트"];
+const takenLoginIds = ["admin", "test"];
 
 export const mockAuthApi: AuthApi = {
   async login({ email, password }) {
@@ -24,6 +25,11 @@ export const mockAuthApi: AuthApi = {
   async checkNickname(nickname) {
     await wait(400);
     return { ok: true, data: { available: !takenNicknames.includes(nickname.trim()) } };
+  },
+
+  async checkLoginId(loginId) {
+    await wait(400);
+    return { ok: true, data: { available: !takenLoginIds.includes(loginId.trim()) } };
   },
 
   async signup(input) {

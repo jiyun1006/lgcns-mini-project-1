@@ -12,6 +12,7 @@ import TermsStep from "@/components/auth/organisms/signup/TermsStep";
 import { useAvailabilityCheck } from "@/hooks/useAvailabilityCheck";
 import {
   validateEmail,
+  validateLoginId,
   validateNickname,
   validatePassword,
   validatePasswordConfirm,
@@ -20,6 +21,7 @@ import { authApi } from "@/service/auth/authApi";
 
 export type SignupValues = {
   terms: boolean[]; // [이용약관, 개인정보, 만 14세, 마케팅(선택)]
+  loginId: string;
   email: string;
   password: string;
   passwordConfirm: string;
@@ -35,6 +37,7 @@ export type UpdateSignupValue = <K extends keyof SignupValues>(
 
 const initialValues: SignupValues = {
   terms: [false, false, false, false],
+  loginId: "",
   email: "",
   password: "",
   passwordConfirm: "",
@@ -51,6 +54,7 @@ export default function SignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [needsApproval, setNeedsApproval] = useState(false);
 
+  const loginIdCheck = useAvailabilityCheck(values.loginId, validateLoginId, authApi.checkLoginId);
   const emailCheck = useAvailabilityCheck(values.email, validateEmail, authApi.checkEmail);
   const nicknameCheck = useAvailabilityCheck(
     values.nickname,
@@ -67,6 +71,7 @@ export default function SignupForm() {
     if (current === 1) return values.terms.slice(0, 3).every(Boolean);
     if (current === 2) {
       return (
+        loginIdCheck.status === "ok" &&
         emailCheck.status === "ok" &&
         !validatePassword(values.password) &&
         !validatePasswordConfirm(values.password, values.passwordConfirm)
@@ -98,6 +103,7 @@ export default function SignupForm() {
     setIsSubmitting(true);
     try {
       const result = await authApi.signup({
+        loginId: values.loginId,
         email: values.email.trim().toLowerCase(),
         password: values.password,
         nickname: values.nickname.trim(),
@@ -143,6 +149,7 @@ export default function SignupForm() {
           <AccountStep
             values={values}
             onChange={update}
+            loginIdCheck={loginIdCheck}
             emailCheck={emailCheck}
             showErrors={showErrors}
           />

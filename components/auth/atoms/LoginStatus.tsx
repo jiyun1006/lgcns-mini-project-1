@@ -6,7 +6,7 @@ import { rememberReturnPath } from "@/actions/returnToActions";
 import { useAuth } from "@/components/auth/providers/AuthProvider";
 
 const buttonClassName =
-  "inline-flex h-8 shrink-0 items-center justify-center rounded-lg border px-2.5 text-sm font-medium disabled:opacity-50";
+  "shrink-0 text-sm font-semibold text-[#52525B] underline underline-offset-4 disabled:opacity-50";
 
 export default function LoginStatus() {
   const { isLoggedIn } = useAuth();
@@ -22,11 +22,7 @@ export default function LoginStatus() {
     };
 
     return (
-      <button
-        type="button"
-        onClick={handleLogin}
-        className={`${buttonClassName} border-transparent bg-[#111827] text-white`}
-      >
+      <button type="button" onClick={handleLogin} className={buttonClassName}>
         로그인
       </button>
     );
@@ -39,12 +35,7 @@ export default function LoginStatus() {
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleLogout}
-      disabled={isPending}
-      className={`${buttonClassName} border-[#d1d5db] bg-white`}
-    >
+    <button type="button" onClick={handleLogout} disabled={isPending} className={buttonClassName}>
       {isPending ? "로그아웃 중..." : "로그아웃"}
     </button>
   );

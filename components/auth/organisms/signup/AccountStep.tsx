@@ -3,11 +3,18 @@ import PasswordStrength from "@/components/auth/molecules/PasswordStrength";
 import TextField from "@/components/auth/molecules/TextField";
 import type { SignupValues, UpdateSignupValue } from "@/components/auth/organisms/SignupForm";
 import { describeCheck, type AvailabilityCheck } from "@/hooks/useAvailabilityCheck";
-import { validateEmail, validatePassword, validatePasswordConfirm } from "@/lib/validation/auth";
+import {
+  LOGIN_ID_RULE,
+  validateEmail,
+  validateLoginId,
+  validatePassword,
+  validatePasswordConfirm,
+} from "@/lib/validation/auth";
 
 type AccountStepProps = {
   values: SignupValues;
   onChange: UpdateSignupValue;
+  loginIdCheck: AvailabilityCheck;
   emailCheck: AvailabilityCheck;
   showErrors: boolean;
 };
@@ -15,14 +22,23 @@ type AccountStepProps = {
 export default function AccountStep({
   values,
   onChange,
+  loginIdCheck,
   emailCheck,
   showErrors,
 }: AccountStepProps) {
+  const loginIdView =
+    showErrors && !values.loginId
+      ? { tone: "error" as const, message: validateLoginId(values.loginId) }
+      : describeCheck(loginIdCheck, {
+          idle: LOGIN_ID_RULE,
+          ok: "사용할 수 있는 아이디예요",
+          taken: "이미 사용 중인 아이디예요",
+        });
   const emailView =
     showErrors && !values.email
       ? { tone: "error" as const, message: validateEmail(values.email) }
       : describeCheck(emailCheck, {
-          idle: "로그인 아이디로 써요. 비밀번호를 찾을 때 보안키도 이 메일로 와요",
+          idle: "로그인에도 쓸 수 있어요. 비밀번호를 찾을 때 보안키가 이 메일로 와요",
           ok: "사용할 수 있는 이메일이에요",
           taken: "이미 가입된 이메일이에요",
         });
@@ -38,9 +54,21 @@ export default function AccountStep({
       <legend className="mb-[18px] text-[19px] font-bold">계정 정보</legend>
 
       <TextField
+        id="signup-loginId"
+        label="아이디"
+        autoComplete="username"
+        placeholder="영문 소문자·숫자·_"
+        value={values.loginId}
+        onChange={(e) => onChange("loginId", e.target.value.trim().toLowerCase())}
+        onClear={() => onChange("loginId", "")}
+        tone={loginIdView.tone}
+        message={loginIdView.message}
+      />
+
+      <TextField
         id="signup-email"
         type="email"
-        label="이메일 (로그인 아이디)"
+        label="이메일"
         autoComplete="email"
         placeholder="example@email.com"
         value={values.email}
