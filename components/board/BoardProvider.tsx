@@ -96,6 +96,7 @@ export default function BoardProvider({ children }: { children: ReactNode }) {
   const path = usePathname();
 
   const isBoard = path === "/posts" || path.startsWith("/posts/");
+  const shouldLoadBoard = isBoard || path === "/myPage";
 
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [user, setUser] = useState<User | null>(null);
@@ -127,7 +128,7 @@ export default function BoardProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   useEffect(() => {
-    if (!isBoard) return;
+    if (!shouldLoadBoard) return;
 
     let active = true;
 
@@ -153,7 +154,7 @@ export default function BoardProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [isBoard]);
+  }, [shouldLoadBoard]);
 
   useEffect(() => {
     if (!notice) return;
