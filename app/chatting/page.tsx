@@ -6,9 +6,18 @@ async function ChatWithParams({
 }: {
   searchParams: PageProps<"/chatting">["searchParams"];
 }) {
-  const { id } = await searchParams;
+  const { id, prompt, request } = await searchParams;
   const initialId = typeof id === "string" ? id : null;
-  return <ChatPage initialId={initialId} />;
+  const initialPrompt = typeof prompt === "string" ? prompt : null;
+  const promptRequestId = typeof request === "string" ? request : null;
+  return (
+    <ChatPage
+      key={`chat-${promptRequestId ?? "default"}`}
+      initialId={initialId}
+      initialPrompt={initialPrompt}
+      initialPromptRequestId={promptRequestId}
+    />
+  );
 }
 
 export default function ChattingPage({ searchParams }: PageProps<"/chatting">) {

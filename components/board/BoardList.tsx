@@ -38,9 +38,7 @@ export default function BoardList() {
           </select>
         </label>
       </div>
-      <h2 className="small-heading">
-        ↗ 인기글 <small className="muted">선택 기간 작성글 · 누적 좋아요순</small>
-      </h2>
+      <h2 className="small-heading">↗ 인기글</h2>
       <div className="trending-grid">
         {trending.map((p, i) => (
           <Link href={`/posts/${p.id}`} className="trending-card" key={p.id}>
