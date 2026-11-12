@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { verifyAccessToken } from "@/lib/accessJwt";
 import { authOptions } from "@/lib/authOptions";
 import { getCurrentUser } from "@/lib/current-user";
+import StaleSessionSignOut from "@/components/auth/atoms/StaleSessionSignOut";
 
 // 서버 컴포넌트는 요청마다 한 번 그려져요. 그 요청 시각을 사진 주소의 버전(?v=)으로 써요
 function requestVersion() {
@@ -20,11 +21,12 @@ export default async function AuthShell({ children }: { children: React.ReactNod
 
   return (
     <AuthProvider
-      accessToken={verified ? accessToken : null}
+      accessToken={user ? accessToken : null}
       name={user?.name ?? null}
       // 헤더 사진 : 주소 끝 ?v= 를 매번 바꿔서 마이페이지에서 바꾼 사진을 새로 받게 해요
       imageUrl={user ? `/api/users/${user.id}/profile-image?v=${requestVersion()}` : null}
     >
+      {verified && !user && <StaleSessionSignOut />}
       {children}
     </AuthProvider>
   );
