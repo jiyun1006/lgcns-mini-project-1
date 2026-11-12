@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 
-import Alert from "@/components/atoms/Alert";
-import Button from "@/components/atoms/Button";
-import SignupProgress from "@/components/molecules/SignupProgress";
-import AccountStep from "@/components/organisms/signup/AccountStep";
-import DoneStep from "@/components/organisms/signup/DoneStep";
-import ProfileStep from "@/components/organisms/signup/ProfileStep";
-import TermsStep from "@/components/organisms/signup/TermsStep";
+import Alert from "@/components/auth/atoms/Alert";
+import Button from "@/components/auth/atoms/Button";
+import SignupProgress from "@/components/auth/molecules/SignupProgress";
+import AccountStep from "@/components/auth/organisms/signup/AccountStep";
+import DoneStep from "@/components/auth/organisms/signup/DoneStep";
+import ProfileStep from "@/components/auth/organisms/signup/ProfileStep";
+import TermsStep from "@/components/auth/organisms/signup/TermsStep";
 import { useAvailabilityCheck } from "@/hooks/useAvailabilityCheck";
 import {
   validateEmail,

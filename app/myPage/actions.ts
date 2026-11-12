@@ -33,7 +33,7 @@ export async function updateProfile(
   };
   const nickname = read("nickname");
   const loginId = read("loginId");
-  const email = read("email");
+  const recoveryEmail = read("recoveryEmail").toLowerCase();
 
   const errors: Partial<Record<ProfileField, string>> = {};
   if (!nickname) errors.nickname = "닉네임은 공백만으로 저장할 수 없습니다.";
@@ -42,9 +42,11 @@ export async function updateProfile(
   if (!loginId) errors.loginId = "아이디는 공백만으로 저장할 수 없습니다.";
   else if (!LOGIN_ID_PATTERN.test(loginId))
     errors.loginId = "아이디는 영문 소문자, 숫자, _만 사용해 1~20자로 입력해주세요.";
-  if (!email) errors.email = "이메일은 공백만으로 저장할 수 없습니다.";
-  else if (email.length > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.test(email))
-    errors.email = "올바른 이메일 형식이 아닙니다.";
+  if (
+    recoveryEmail &&
+    (recoveryEmail.length > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.test(recoveryEmail))
+  )
+    errors.recoveryEmail = "올바른 이메일 형식이 아닙니다.";
 
   // 파일이 없으면 사진은 그대로 둔다. 문자열(외부 URL 등)은 받지 않는다.
   let profileImageUrl: string | undefined;
@@ -67,11 +69,13 @@ export async function updateProfile(
     select: { id: true },
   });
   if (taken) return { errors: { loginId: "이미 사용 중인 아이디입니다." } };
+  if (recoveryEmail && recoveryEmail === user.email)
+    return { errors: { recoveryEmail: "가입 이메일과 다른 이메일을 넣어 주세요." } };
 
   try {
     await prisma.user.update({
       where: { id: user.id },
-      data: { name: nickname, loginId, email, profileImageUrl },
+      data: { name: nickname, loginId, recoveryEmail: recoveryEmail || null, profileImageUrl },
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")

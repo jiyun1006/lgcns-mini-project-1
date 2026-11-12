@@ -2,6 +2,7 @@ export interface MyPageUser {
   nickname: string;
   loginId: string;
   email: string;
+  recoveryEmail: string;
   profileImageUrl: string | null;
   bio: string;
   interests: string[];
@@ -10,7 +11,7 @@ export interface MyPageUser {
   showInterests: boolean;
 }
 
-export type ProfileField = "nickname" | "loginId" | "email" | "profileImage";
+export type ProfileField = "nickname" | "loginId" | "email" | "recoveryEmail" | "profileImage";
 
 export interface ProfileFormState {
   ok?: boolean;
