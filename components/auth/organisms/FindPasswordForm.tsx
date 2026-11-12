@@ -59,14 +59,13 @@ export default function FindPasswordForm() {
         setError(result.message);
         return;
       }
-      // 강사님 서버가 이 사람의 로그인을 모두 끊었으니, 우리 팔찌도 지워요
       await signOut({ redirect: false });
       setStep("done");
     });
   };
 
   const cardClass =
-    "flex w-full max-w-[420px] flex-col gap-[18px] rounded-2xl border border-[#E4E4E7] bg-white px-8 py-9";
+    "flex w-full max-w-105 flex-col gap-4.5 rounded-2xl border border-[#E4E4E7] bg-white px-8 py-9";
 
   if (step === "done") {
     return (

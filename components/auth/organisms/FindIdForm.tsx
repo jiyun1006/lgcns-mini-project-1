@@ -18,7 +18,7 @@ export default function FindIdForm() {
     <form
       action={formAction}
       noValidate
-      className="flex w-full max-w-[420px] flex-col gap-[18px] rounded-2xl border border-[#E4E4E7] bg-white px-8 py-9"
+      className="flex w-full max-w-105 flex-col gap-4.5 rounded-2xl border border-[#E4E4E7] bg-white px-8 py-9"
     >
       <header className="flex flex-col gap-1.5 text-center">
         <h1 className="text-[26px] font-extrabold">아이디 찾기</h1>

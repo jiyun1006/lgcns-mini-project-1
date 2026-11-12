@@ -51,7 +51,6 @@ export async function checkLoginIdAction(loginId: string): Promise<ApiResult<Che
 export async function signupAction(
   input: SignupInput,
 ): Promise<ApiResult<{ needsApproval: boolean }>> {
-  // 0) 서버에서 다시 검사 (화면 검사는 건너뛸 수 있어요)
   const error =
     validateLoginId(input.loginId) ||
     validateEmail(input.email) ||
@@ -63,14 +62,12 @@ export async function signupAction(
   const nickname = input.nickname.trim();
   const interests = input.interests.slice(0, MAX_INTERESTS).map((tag) => tag.slice(0, 20));
 
-  // 0-1) 아이디가 그사이 다른 사람에게 갔는지 (Spring에 가입하기 전에 확인)
   const taken = await prisma.user.findFirst({
     where: { loginId, NOT: { email } },
     select: { id: true },
   });
   if (taken) return { ok: false, message: "이미 사용 중인 아이디예요. 다른 아이디를 골라 주세요." };
 
-  // 1) 강사님 Spring에 가입 (이메일·비밀번호는 Spring이 보관)
   const response = await springFetch.post<SpringLoginData>(matchApiUrl.auth.signup, {
     email,
     name: nickname,
@@ -83,7 +80,6 @@ export async function signupAction(
     };
   }
 
-  // 2) 우리 Mongo에 아이디·닉네임·관심사 (채팅·커뮤니티가 쓰는 회원)
   await prisma.user.upsert({
     where: { email },
     update: { name: nickname, interests, loginId },
@@ -91,7 +87,6 @@ export async function signupAction(
     select: { id: true },
   });
 
-  // 3) 강사님 서버가 "승인 대기"로 받았는지 (SIGNUP_AUTO_APPROVE가 꺼져 있으면)
   const needsApproval = response.data?.accountStatus === "PENDING_APPROVAL";
   return { ok: true, data: { needsApproval } };
 }

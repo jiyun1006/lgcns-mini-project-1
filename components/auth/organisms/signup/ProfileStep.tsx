@@ -30,7 +30,7 @@ export default function ProfileStep({
   return (
     <fieldset className="flex flex-col gap-5">
       <legend className="mb-5 text-[19px] font-bold">프로필 설정</legend>
-      <div className="flex items-start gap-[18px]">
+      <div className="flex items-start gap-4.5">
         <AvatarPicker
           initial={values.nickname.trim().slice(0, 1)}
           previewUrl={values.photoPreviewUrl}

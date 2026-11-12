@@ -1,9 +1,7 @@
 import type { AuthApi } from "./authApi";
 
-// 진짜 서버처럼 조금 기다렸다가 답해요
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// 이미 가입된 척하는 목록
 const takenEmails = ["test@test.com", "admin@test.com"];
 const takenNicknames = ["관리자", "테스트"];
 const takenLoginIds = ["admin", "test"];
