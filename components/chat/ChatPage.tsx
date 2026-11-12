@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChatMessage, Conversation } from "@/types/chat";
 import ChatSidebar from "@/components/chat/ChatSidebar";
 import ChatMessages from "@/components/chat/ChatMessages";
@@ -16,6 +16,13 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState("");
+
+  // 스트리밍 중인 대화의 메시지를 따로 보관 (다른 채팅에 갔다 와도 이어서 보이도록)
+  const activeIdRef = useRef<string | null>(null);
+  const streamRef = useRef<{ conversationId: string; messages: ChatMessage[] } | null>(null);
+  useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
 
   // 최근 대화 목록 조회
   const loadConversations = async () => {
@@ -39,7 +46,9 @@ export default function ChatPage() {
 
     const data = (await response.json()) as Conversation;
     setActiveId(data.id);
-    setMessages(data.messages ?? []);
+    // 이 대화가 아직 답변 중이면 DB 대신 스트리밍 중인 메시지를 보여줌
+    const stream = streamRef.current;
+    setMessages(stream?.conversationId === data.id ? stream.messages : (data.messages ?? []));
   };
 
   // 새로운 대화 생성
@@ -142,7 +151,10 @@ export default function ChatPage() {
       let conversationId = activeId;
       if (!conversationId) conversationId = await createConversation();
 
-      setMessages((prev) => [...prev, userMsg, aiMsg]);
+      const base = activeId ? messages : [];
+      streamRef.current = { conversationId, messages: [...base, userMsg, aiMsg] };
+      activeIdRef.current = conversationId;
+      setMessages(streamRef.current.messages);
       setQuestion("");
 
       const response = await fetch("/api/chat", {
@@ -164,17 +176,26 @@ export default function ChatPage() {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        setMessages((prev) =>
-          prev.map((m) => (m.id === aiMsg.id ? { ...m, content: m.content + chunk } : m)),
+        const stream = streamRef.current;
+        if (!stream) break;
+        stream.messages = stream.messages.map((m) =>
+          m.id === aiMsg.id ? { ...m, content: m.content + chunk } : m,
         );
+        // 지금 보고 있는 대화일 때만 화면 갱신
+        if (activeIdRef.current === stream.conversationId) setMessages(stream.messages);
       }
 
       await loadConversations(); // 사이드바 제목, 순서 갱신
     } catch (err) {
       // 실패하면 빈 AI 말풍선 제거
-      setMessages((prev) => prev.filter((m) => m.id !== aiMsg.id));
+      const stream = streamRef.current;
+      if (stream) {
+        stream.messages = stream.messages.filter((m) => m.id !== aiMsg.id);
+        if (activeIdRef.current === stream.conversationId) setMessages(stream.messages);
+      }
       setError(err instanceof Error ? err.message : "오류 발생");
     } finally {
+      streamRef.current = null;
       setLoading(false);
     }
   };
@@ -198,12 +219,33 @@ export default function ChatPage() {
   const activeTitle =
     conversations.find((conversation) => conversation.id === activeId)?.title ?? "새 대화";
 
+  useEffect(() => {
+    if (loading) return; // 지금 이 화면에서 스트리밍 중이면 불필요
+    const last = messages[messages.length - 1];
+    if (!activeId || last?.role !== "USER") return;
+
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries += 1;
+      if (tries > 40) return clearInterval(timer); // 최대 약 2분
+      const res = await fetch(`/api/conversations?id=${activeId}`);
+      if (!res.ok) return;
+      const data = (await res.json()) as Conversation;
+      const lastMsg = data.messages?.[data.messages.length - 1];
+      if (lastMsg?.role === "ASSISTANT") {
+        setMessages(data.messages ?? []);
+        clearInterval(timer);
+      }
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [activeId, messages, loading]);
   return (
     <main
       style={{
         display: "flex",
         width: "100%",
-        height: "100d%",
+        height: "100%",
         overflow: "hidden",
         fontFamily: "Arial, sans-serif",
         color: "#222",

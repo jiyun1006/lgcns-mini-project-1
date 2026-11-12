@@ -83,6 +83,7 @@ export async function POST(req: Request) {
       },
       onError: ({ error }) => console.error("EXAONE stream error:", error),
     });
+    result.consumeStream();
 
     return createTextStreamResponse({
       stream: toTextStream({ stream: result.stream }),
