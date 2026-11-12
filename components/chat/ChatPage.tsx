@@ -6,7 +6,7 @@ import ChatSidebar from "@/components/chat/ChatSidebar";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatInput from "@/components/chat/ChatInput";
 
-export default function ChatPage() {
+export default function ChatPage({ initialId }: { initialId: string | null }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -46,6 +46,7 @@ export default function ChatPage() {
 
     const data = (await response.json()) as Conversation;
     setActiveId(data.id);
+    window.history.replaceState(null, "", `/chatting?id=${data.id}`);
     // 이 대화가 아직 답변 중이면 DB 대신 스트리밍 중인 메시지를 보여줌
     const stream = streamRef.current;
     setMessages(stream?.conversationId === data.id ? stream.messages : (data.messages ?? []));
@@ -59,6 +60,7 @@ export default function ChatPage() {
     const data = (await response.json()) as Conversation;
     setConversations((prev) => [data, ...prev]);
     setActiveId(data.id);
+    window.history.replaceState(null, "", `/chatting?id=${data.id}`);
     setMessages([]);
     setQuestion("");
     setError("");
@@ -205,7 +207,9 @@ export default function ChatPage() {
     const initialize = async () => {
       try {
         const data = await loadConversations();
-        if (data.length > 0) await selectConversation(data[0].id);
+        // 바뀐 부분: 맨 위(data[0]) 대신 URL의 id를 먼저 찾는다
+        const target = data.find((c) => c.id === initialId) ?? data[0];
+        if (target) await selectConversation(target.id);
       } catch {
         setError("서버에 연결할 수 없습니다.");
       } finally {
