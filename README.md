@@ -1,15 +1,25 @@
-# 미니프로젝트1
+<div align="center">
 
-> LG CNS AM Inspire Camp 7기 미니프로젝트 (8명 · 4일)
-> **K-EXAONE 2.5를 활용한 AI 채팅 · 커뮤니티 서비스**
+
+# Chat EXAONE
+
+**K-EXAONE 2.5를 활용한 AI 채팅 · 커뮤니티 서비스**
+
+LG CNS AM Inspire Camp 7기 미니프로젝트 (8명 · 4일)
+
+<a href="https://lgcns-mini-project-1.vercel.app">
+  <img src="https://img.shields.io/badge/Live%20Demo-Chat%20EXAONE-4938d1?style=for-the-badge&logo=vercel&logoColor=white" alt="Chat EXAONE 바로가기" />
+</a>
+
+</div>
 
 ## 팀원
 
 | 파트 | 팀원 | 브랜치 | 담당 범위 |
 | --- | --- | --- | --- |
-| 인증 | 오동현, 이지혜 | `part/auth` | 회원가입, 로그인, 아이디·비밀번호 찾기, 세션, 마이 페이지 |
-| 채팅 | 김지윤, 허진우 | `part/chat` | 채팅 UI, 메시지 전송 API, EXAONE 연동, 대화방 관리 |
-| 포스트 | 김유진, 방경호, 배상아, 안승찬 | `part/post` | 게시글 작성·수정·삭제, 검색·필터·정렬, 댓글·답글, 좋아요 기능 |
+| 인증 | 오동현, 이지혜 | [`part/auth`](https://github.com/lgcns-mjp1-team/lgcns-mini-project-1/tree/part/auth) | 회원가입, 로그인, 아이디·비밀번호 찾기, 마이페이지 |
+| 채팅 | 김지윤, 허진우 | [`part/chat`](https://github.com/lgcns-mjp1-team/lgcns-mini-project-1/tree/part/chat) | 채팅 UI, 메시지 전송 API, EXAONE 연동, 대화방 관리 |
+| 포스트 | 김유진, 방경호, 배상아, 안승찬 | [`part/post`](https://github.com/lgcns-mjp1-team/lgcns-mini-project-1/tree/part/post) | 게시글 작성·수정·삭제, 검색·필터·정렬, 댓글·답글, 좋아요 |
 
 ## 서비스 소개
 
@@ -27,13 +37,13 @@
 
 | 구분 | 사용 기술 |
 | --- | --- |
-| Framework | Next.js 16 (App Router), TypeScript |
-| Style | Tailwind CSS, shadcn/ui |
-| DB | MongoDB Atlas + Prisma 6 |
-| Auth | NextAuth (Credentials) + Spring 회원 API |
-| AI | K-EXAONE 2.5 (EXAONE API), Vercel AI SDK |
-| 배포 | Vercel |
-| 협업 | ESLint, Prettier, husky + lint-staged |
+| Framework | ![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=nextdotjs&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) |
+| Style | ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) ![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000000?style=flat-square&logo=shadcnui&logoColor=white) |
+| DB | ![MongoDB](https://img.shields.io/badge/MongoDB_Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma_6-2D3748?style=flat-square&logo=prisma&logoColor=white) |
+| Auth | ![NextAuth](https://img.shields.io/badge/NextAuth-4938d1?style=flat-square) ![Spring](https://img.shields.io/badge/Spring_회원_API-6DB33F?style=flat-square&logo=spring&logoColor=white) |
+| AI | ![K-EXAONE](https://img.shields.io/badge/K--EXAONE_2.5-A50034?style=flat-square) ![Vercel AI SDK](https://img.shields.io/badge/Vercel_AI_SDK-000000?style=flat-square&logo=vercel&logoColor=white) |
+| 배포 | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) |
+| 협업 | ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat-square&logo=eslint&logoColor=white) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=flat-square&logo=prettier&logoColor=black) ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white) |
 
 ## 시작하기
 
@@ -124,13 +134,14 @@ lgcns-mini-project-1/
 
 ## 배포 (Vercel)
 
+배포된 서비스는 맨 위의 **Live Demo** 배지에서 확인할 수 있습니다.
+
 | 브랜치 | 결과 |
 | --- | --- |
-| `main` | **Production** 배포 (`https://lgcns-mini-project-1.vercel.app`) |
+| `main` | **Production** 배포 (Live Demo가 가리키는 주소) |
 | `develop`, `part/*` 등 | 푸시할 때마다 **Preview** 배포가 자동 생성 |
 
-- 확인용 주소는 **브랜치 주소**를 씁니다. 예: `https://lgcns-mini-project-1-git-develop-jiyun17.vercel.app` (항상 `develop` 최신)
-- 주소에 해시가 붙은 **배포별 주소**는 그 배포 하나에 고정돼 있어 최신이 아닐 수 있습니다.
+- 확인용으로는 **브랜치 주소**(항상 해당 브랜치의 최신 배포)를 씁니다. 주소에 해시가 붙은 **배포별 주소**는 그 배포 하나에 고정돼 있어 최신이 아닐 수 있습니다.
 - **배포는 만들어진 시점의 스냅샷**입니다. 환경 변수를 바꿔도 이미 만든 배포에는 반영되지 않으니, 새로 푸시하거나 **최신 배포를** Redeploy 하세요. Error 난 옛 배포를 Redeploy 하면 같은 에러가 반복됩니다.
 - Vercel 환경 변수에서 `NEXTAUTH_URL`은 **Production에만** 운영 도메인으로 지정하고, Preview에는 넣지 않습니다.
 - 배포 대시보드와 서버 로그는 계정 소유자만 볼 수 있습니다. 에러가 나면 **어떤 동작을 했는지와 화면 캡처, 브라우저 Network 탭의 실패한 요청**을 공유해주세요.
