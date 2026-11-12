@@ -6,11 +6,12 @@ import { buttonVariants } from "@/components/mypage/atoms/MyPageButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { isObjectId } from "@/lib/current-user";
 
 async function PublicProfile({ params }: { params: PageProps<"/users/[loginId]">["params"] }) {
   const { loginId } = await params;
   const user = await prisma.user.findFirst({
-    where: { loginId },
+    where: isObjectId(loginId) ? { id: loginId } : { loginId },
     select: {
       name: true,
       loginId: true,
@@ -41,7 +42,7 @@ async function PublicProfile({ params }: { params: PageProps<"/users/[loginId]">
           </Avatar>
           <div className="grid">
             <h2 className="text-lg font-bold text-stone-900">{user.name}</h2>
-            <span className="text-sm text-stone-500">@{user.loginId}</span>
+            {user.loginId && <span className="text-sm text-stone-500">@{user.loginId}</span>}
           </div>
         </div>
         {!isPublic ? (

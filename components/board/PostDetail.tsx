@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useBoard } from "./BoardProvider";
 import Comments from "./Comments";
 export default function PostDetail({ postId }: { postId: string }) {
@@ -30,6 +31,7 @@ export default function PostDetail({ postId }: { postId: string }) {
         <Link href="/posts">목록으로 돌아가기</Link>
       </main>
     );
+  const authorHref = `/users/${encodeURIComponent(post.authorId || "")}`;
   async function copy() {
     try {
       await navigator.clipboard.writeText(post!.prompt);
@@ -48,9 +50,25 @@ export default function PostDetail({ postId }: { postId: string }) {
         <span className="badge">{post.category}</span>
         <h1>{post.title}</h1>
         <div className="section-heading">
-          <p className="muted">
-            {post.author} · {post.createdAt.slice(0, 10)} · 조회 {post.viewCount.toLocaleString()}
-          </p>
+          <div className="post-detail-meta muted">
+            <Link
+              className="post-author"
+              href={authorHref}
+              aria-label={`${post.author} 프로필 보기`}
+            >
+              <Avatar className="post-author-avatar">
+                {post.authorProfileImageUrl && (
+                  <AvatarImage src={post.authorProfileImageUrl} alt="" />
+                )}
+                <AvatarFallback>{post.author.slice(0, 1)}</AvatarFallback>
+              </Avatar>
+              <span>{post.author}</span>
+            </Link>
+            <span aria-hidden="true">·</span>
+            <time dateTime={post.createdAt}>{post.createdAt.slice(0, 10)}</time>
+            <span aria-hidden="true">·</span>
+            <span>조회 {post.viewCount.toLocaleString()}</span>
+          </div>
           {post.authorId === user?.id && (
             <div className="actions">
               <Link className="button" href={`/posts/${post.id}/edit`}>
