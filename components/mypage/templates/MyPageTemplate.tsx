@@ -1,4 +1,4 @@
-import { House, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/mypage/atoms/MyPageButton";
 import AccountCard from "@/components/mypage/organisms/AccountCard";
@@ -12,20 +12,14 @@ import type { MyPageUser } from "@/types/mypage";
 
 export default function MyPageTemplate({ user }: { user: MyPageUser }) {
   return (
-    <div className="flex-1 bg-[#f3f4f6] px-4 py-8 text-[#222]">
+    <div className="flex-1 bg-(--ds-bg) px-4 py-8 text-(--ds-ink)">
       <div className="mx-auto grid max-w-2xl gap-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">마이페이지</h1>
-          <div className="flex gap-2">
-            <Link href="/users" className={buttonVariants({ variant: "outline" })}>
-              <Search aria-hidden />
-              유저 검색
-            </Link>
-            <Link href="/" className={buttonVariants({ variant: "outline" })}>
-              <House aria-hidden />
-              홈으로
-            </Link>
-          </div>
+          <Link href="/users" className={buttonVariants({ variant: "outline" })}>
+            <Search aria-hidden />
+            유저 검색
+          </Link>
         </div>
         <ProfileInfoCard user={user} />
         <IntroCard bio={user.bio} interests={user.interests} />
@@ -34,9 +28,9 @@ export default function MyPageTemplate({ user }: { user: MyPageUser }) {
           showEmail={user.showEmail}
           showInterests={user.showInterests}
         />
+        <ActivityCard />
         <PasswordChangeCard />
         <AccountCard />
-        <ActivityCard />
         <WithdrawCard />
       </div>
     </div>
