@@ -45,3 +45,6 @@ next-env.d.ts
 # claudes
 /.claude
 CLAUDE.md
+
+# API md
+AUTH_EMAIL_LOGOUT_API.md

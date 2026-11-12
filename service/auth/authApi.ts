@@ -1,0 +1,23 @@
+import { mockAuthApi } from "./mockAuthApi";
+
+export type ApiResult<T = null> = { ok: true; data: T } | { ok: false; message: string };
+
+export type LoginInput = { email: string; password: string };
+
+export type SignupInput = {
+  email: string;
+  password: string;
+  nickname: string;
+  interests: string[];
+  marketingAgreed: boolean;
+};
+
+export type AuthApi = {
+  login(input: LoginInput): Promise<ApiResult>;
+  checkEmail(email: string): Promise<ApiResult<{ available: boolean }>>;
+  checkNickname(nickname: string): Promise<ApiResult<{ available: boolean }>>;
+  signup(input: SignupInput): Promise<ApiResult<{ needsApproval: boolean }>>;
+};
+
+// 🔌 진짜 API를 붙일 때 이 줄만 바꿔요 (mockAuthApi → realAuthApi, 6-4)
+export const authApi: AuthApi = mockAuthApi;

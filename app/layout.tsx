@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import BoardProvider from "@/components/board/BoardProvider";
+import AuthShell from "@/components/providers/AuthShell";
 import "./globals.css";
 import "./posts/board.css";
-import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Suspense fallback={<div role="status">화면을 불러오는 중이에요…</div>}>
-          <BoardProvider>{children}</BoardProvider>
+          <AuthShell>
+            <BoardProvider>{children}</BoardProvider>
+          </AuthShell>
         </Suspense>
       </body>
     </html>
