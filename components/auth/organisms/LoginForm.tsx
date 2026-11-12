@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
-import Alert from "@/components/atoms/Alert";
-import Button from "@/components/atoms/Button";
-import PasswordField from "@/components/molecules/PasswordField";
-import SocialLoginButtons from "@/components/molecules/SocialLoginButtons";
-import TextField from "@/components/molecules/TextField";
+import Alert from "@/components/auth/atoms/Alert";
+import Button from "@/components/auth/atoms/Button";
+import PasswordField from "@/components/auth/molecules/PasswordField";
+import SocialLoginButtons from "@/components/auth/molecules/SocialLoginButtons";
+import TextField from "@/components/auth/molecules/TextField";
 import { forgetEmail, rememberEmail } from "@/lib/savedEmail";
 import { authApi } from "@/service/auth/authApi";
+import { CONTINUE_PATH } from "@/lib/returnTo";
 
 // 🔌 진짜 API를 붙일 때 CONTINUE_PATH(원래 페이지로)로 바꿔요 (6-4)
-const AFTER_LOGIN_PATH = "/";
+const AFTER_LOGIN_PATH = CONTINUE_PATH;
 
 type LoginValues = { email: string; password: string };
 type LoginErrors = Partial<Record<keyof LoginValues, string>>;
@@ -37,7 +38,7 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
 
     // 1) 빈칸 검사 (로그인은 형식 검사를 깊게 안 해요. 틀리면 서버가 알려 줘요)
     const nextErrors: LoginErrors = {
-      email: values.email.trim() ? "" : "이메일을 입력해 주세요.",
+      email: values.email.trim() ? "" : "아이디 또는 이메일을 입력해 주세요.",
       password: values.password ? "" : "비밀번호를 입력해 주세요.",
     };
     setErrors(nextErrors);
@@ -80,10 +81,10 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
       <TextField
         id="email"
         name="email"
-        type="email"
-        label="이메일"
-        autoComplete="email"
-        placeholder="example@email.com"
+        type="text"
+        label="아이디 또는 이메일"
+        autoComplete="username"
+        placeholder="아이디 또는 example@email.com"
         value={values.email}
         onChange={handleChange}
         onClear={() => setValues((prev) => ({ ...prev, email: "" }))}
@@ -111,7 +112,7 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
             onChange={(e) => setIsRemembered(e.target.checked)}
             className="h-[18px] w-[18px] accent-[#4338CA]"
           />
-          이메일 기억하기
+          아이디 기억하기
         </label>
         <span className="flex gap-1.5 text-[#52525B]">
           <Link href="/find-id">아이디 찾기</Link>

@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import { EXPIRES_IN_SECONDS, signAccessToken } from "@/lib/accessJwt";
 import { springAuthLogin } from "@/service/spring/springAuthService";
+import { makeLoginId, toLoginEmail } from "@/lib/loginId";
+import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -18,12 +20,27 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const result = await springAuthLogin(credentials.email, credentials.password);
+        const loginEmail = await toLoginEmail(credentials.email);
+        if (!loginEmail) throw new Error("이메일 또는 비밀번호가 올바르지 않습니다.");
+        const result = await springAuthLogin(loginEmail, credentials.password);
+
         if (!result.ok) throw new Error(result.message);
         const data = result.data;
 
+        // 🔀 Spring 회원을 팀 Mongo User에도 둔다 (있으면 그대로, 없으면 만들기)
+        const mongoUser = await prisma.user.upsert({
+          where: { email: data.email },
+          update: {},
+          create: {
+            email: data.email,
+            name: data.name || data.email,
+            loginId: await makeLoginId(data.email),
+          },
+          select: { id: true },
+        });
+
         return {
-          id: String(data.userId),
+          id: mongoUser.id,
           email: data.email,
           name: data.name,
           profileImageUrl: data.avatarUrl ?? "",

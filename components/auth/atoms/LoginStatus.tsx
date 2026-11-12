@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { signOut } from "next-auth/react";
 import { rememberReturnPath } from "@/actions/returnToActions";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useAuth } from "@/components/auth/providers/AuthProvider";
 
 const buttonClassName =
   "inline-flex h-8 shrink-0 items-center justify-center rounded-lg border px-2.5 text-sm font-medium disabled:opacity-50";

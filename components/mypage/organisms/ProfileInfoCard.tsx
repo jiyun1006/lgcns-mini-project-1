@@ -17,9 +17,20 @@ import { updateProfile } from "@/app/myPage/actions";
 import type { MyPageUser, ProfileFormState } from "@/types/mypage";
 
 const fields = [
-  { key: "nickname", label: "닉네임", type: "text" },
-  { key: "loginId", label: "아이디", type: "text" },
-  { key: "email", label: "이메일", type: "email" },
+  { key: "nickname", label: "닉네임", type: "text", editable: true },
+  { key: "loginId", label: "아이디 (로그인할 때도 써요)", type: "text", editable: true },
+  {
+    key: "email",
+    label: "가입 이메일 (로그인·비밀번호 찾기용 · 바꿀 수 없어요)",
+    type: "email",
+    editable: false,
+  },
+  {
+    key: "recoveryEmail",
+    label: "복구용 이메일 (선택 · 가입 이메일을 잊었을 때 아이디 찾기에 써요)",
+    type: "email",
+    editable: true,
+  },
 ] as const;
 
 export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
@@ -93,14 +104,14 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
             error={errors?.profileImage}
             onSelect={() => !isEditing && startEditing()}
           />
-          {fields.map(({ key, label, type }) =>
-            isEditing ? (
+          {fields.map(({ key, label, type, editable }) =>
+            isEditing && editable ? (
               <div key={key} className="grid gap-1.5">
                 <FormField
                   id={key}
                   label={label}
                   type={type}
-                  required
+                  required={key !== "recoveryEmail"}
                   aria-invalid={!!errors?.[key] || undefined}
                   aria-describedby={errors?.[key] ? `${key}-error` : undefined}
                   value={draft[key]}
@@ -115,7 +126,7 @@ export default function ProfileInfoCard({ user }: { user: MyPageUser }) {
             ) : (
               <div key={key} className="grid gap-1.5">
                 <span className="text-xs font-medium text-stone-500">{label}</span>
-                <span className="text-sm text-stone-900">{user[key]}</span>
+                <span className="text-sm text-stone-900">{user[key] || "등록 안 함"}</span>
               </div>
             ),
           )}
