@@ -33,6 +33,9 @@ export async function POST(req: Request) {
 
     let content = isRecovery ? "" : raw.trim();
     const user = await getCurrentUser();
+    if (!user) {
+      return Response.json({ error: "로그인이 필요해요." }, { status: 401 });
+    }
 
     const conv = conversationId
       ? await prisma.conversation.findFirst({ where: { id: conversationId, userId: user.id } })
