@@ -21,7 +21,7 @@ export async function GET(req: Request) {
         select: {
           ...conversationSelect,
           messages: {
-            orderBy: { createdAt: "asc" },
+            orderBy: [{ createdAt: "asc" }, { id: "asc" }],
             select: { id: true, role: true, content: true, createdAt: true },
           },
         },
