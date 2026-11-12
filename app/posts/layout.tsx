@@ -1,10 +1,10 @@
-import BoardHeader from "@/components/board/BoardHeader";
+import SiteHeader from "@/components/design/organisms/SiteHeader";
 import "./board.css";
 export default function PostsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="board-shell">
-      <BoardHeader />
-      {children}
-    </div>
+    <>
+      <SiteHeader />
+      <div className="board-shell">{children}</div>
+    </>
   );
 }
