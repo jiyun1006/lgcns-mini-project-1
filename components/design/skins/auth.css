@@ -1,0 +1,224 @@
+/*
+ * 헤더 없는 화면(로그인 · 회원가입 · 아이디 찾기 · 비밀번호 찾기) 공통 모양
+ * - 구성 · 순서 · 문구는 그대로, 모양만 통일한다.
+ * - 상자 크기 고정: 로그인 · 아이디 찾기 420×560, 비밀번호 찾기 420×800(세 단계 모두), 회원가입 480×720
+ * - 안 들썩임: 오류는 칸 아래 안내 줄(미리 비워 둔 20px)에 띄우고, 결과 자리도 미리 비워 둔다.
+ */
+
+/* 화면 바탕: 위에서 아래로 곧게 옅어지는 연보라 */
+.ds-auth-page {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  background: linear-gradient(180deg, #e4defb 0%, #efecfb 32%, var(--ds-bg) 68%);
+}
+
+/* 로그인 · 아이디 찾기 상자 */
+.ds-auth-card {
+  display: flex;
+  width: 420px;
+  max-width: 100%;
+  height: 560px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 36px 32px 28px;
+  border: 1px solid var(--ds-line);
+  border-radius: 20px;
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-2);
+  overflow-y: auto;
+}
+/* 비밀번호 찾기: 보안키 · 새 비밀번호 단계까지 스크롤 없이 들어가는 높이 */
+.ds-auth-tall {
+  height: 800px;
+}
+/* 비밀번호를 바꿨어요: 제목 · 안내 · 버튼만 상자 가운데 */
+.ds-auth-center {
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.ds-auth-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.ds-auth-head h1,
+.ds-auth-center h1 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* 상자 맨 아래 줄 (회원가입 · 로그인 | 비밀번호 찾기 링크) */
+.ds-auth-foot {
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+/* 아이디 찾기 결과 자리: 버튼과 24px 띄우고, 결과 · '없어요' 상자 높이만큼 미리 비워 둔다 */
+.ds-auth-result-slot {
+  min-height: 84px;
+  margin-top: 12px;
+}
+
+/* ── 회원가입: 위(제목 · 단계) / 가운데(내용만 스크롤) / 아래(오류 줄 · 버튼 · 로그인) 고정 ── */
+.ds-auth-signup-card {
+  display: flex;
+  width: 480px;
+  max-width: 100%;
+  height: 720px;
+  flex-direction: column;
+  border: 1px solid var(--ds-line);
+  border-radius: 20px;
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-2);
+  overflow: hidden;
+}
+.ds-auth-signup-top {
+  flex: none;
+  padding: 30px 32px 16px;
+  border-bottom: 1px solid var(--ds-line);
+}
+.ds-auth-signup-top h1 {
+  margin-bottom: 16px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+.ds-auth-signup-body {
+  min-height: 0;
+  flex: 1;
+  padding: 16px 32px 32px;
+  overflow-y: auto;
+  /* 아래로 더 있는 내용이 살짝 흐려지며 이어지게 */
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 28px), transparent);
+}
+.ds-auth-signup-foot {
+  display: grid;
+  flex: none;
+  gap: 6px;
+  padding: 10px 32px 24px;
+  border-top: 1px solid var(--ds-line);
+}
+.ds-auth-foot-error {
+  min-height: 20px;
+  color: var(--ds-danger);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+}
+.ds-auth-foot-login {
+  margin-top: 8px;
+  color: var(--ds-ink-2);
+  font-size: 14px;
+  text-align: center;
+}
+.ds-auth-foot-login a {
+  color: var(--ds-primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.15s;
+}
+.ds-auth-foot-login a:hover {
+  text-decoration-color: currentColor;
+}
+/* 4단계(가입 완료)는 글자만 숨기고 자리는 남겨 버튼이 안 움직이게 */
+.ds-auth-foot-login[data-hidden] {
+  visibility: hidden;
+}
+
+/* 단계가 바뀌면 내용만 옆으로 미끄러져 들어온다: [다음]은 오른쪽에서, [이전]은 왼쪽에서 */
+.ds-auth-slide-next {
+  animation: ds-slide-from-right 0.36s var(--ds-ease) both;
+}
+.ds-auth-slide-prev {
+  animation: ds-slide-from-left 0.36s var(--ds-ease) both;
+}
+@keyframes ds-slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+}
+@keyframes ds-slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+}
+
+/* ── 휴대폰: 카드 없이 화면 전체를 쓴다 (순서 · 자리는 그대로) ── */
+@media (max-width: 640px) {
+  .ds-auth-page {
+    align-items: flex-start;
+    padding: 56px 20px 40px;
+    background: linear-gradient(180deg, #e7e2fc 0, #f2f0fb 160px, var(--ds-bg) 420px);
+  }
+  .ds-auth-card,
+  .ds-auth-tall {
+    width: 100%;
+    height: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .ds-auth-head {
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    text-align: left;
+  }
+  .ds-auth-head h1,
+  .ds-auth-center h1 {
+    font-size: 28px;
+  }
+  .ds-auth-foot {
+    padding-top: 18px;
+  }
+  .ds-auth-center {
+    padding-top: 80px;
+    text-align: left;
+  }
+
+  /* 회원가입: 화면 높이에 고정, 가운데만 스크롤, 버튼은 아래에 고정 */
+  .ds-auth-page[data-variant="signup"] {
+    display: block;
+    padding: 0;
+  }
+  .ds-auth-signup-card {
+    width: 100%;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .ds-auth-signup-top {
+    padding: 24px 20px 14px;
+  }
+  .ds-auth-signup-top h1 {
+    margin-bottom: 14px;
+    font-size: 24px;
+    text-align: left;
+  }
+  .ds-auth-signup-body {
+    padding: 14px 20px 32px;
+  }
+  .ds-auth-signup-foot {
+    padding: 8px 20px calc(14px + env(safe-area-inset-bottom));
+    background: var(--ds-surface);
+  }
+}

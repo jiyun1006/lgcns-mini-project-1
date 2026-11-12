@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ComponentProps, type KeyboardEvent } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import TextField from "./TextField";
 
@@ -27,22 +28,13 @@ export default function PasswordField({ message, onKeyUp, ...rest }: PasswordFie
           onClick={() => setIsVisible((prev) => !prev)}
           aria-label={isVisible ? "비밀번호 숨기기" : "비밀번호 보기"}
           aria-pressed={isVisible}
-          className="flex h-11 w-11 items-center justify-center text-[#52525B]"
+          className="flex h-11 w-11 items-center justify-center text-(--ds-ink-2)"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
+          {isVisible ? (
+            <EyeOff size={18} strokeWidth={1.75} aria-hidden="true" />
+          ) : (
+            <Eye size={18} strokeWidth={1.75} aria-hidden="true" />
+          )}
         </button>
       }
     />

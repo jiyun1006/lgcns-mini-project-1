@@ -13,10 +13,10 @@ export default function SignupProgress({ current }: { current: number }) {
             className="flex flex-col items-center gap-1.5"
           >
             <span
-              className={`h-1 w-full rounded-sm ${num <= current ? "bg-[#4338CA]" : "bg-[#E4E4E7]"}`}
+              className={`h-1 w-full rounded-sm ${num <= current ? "bg-(--ds-primary)" : "bg-(--ds-line)"}`}
             />
             <span
-              className={`text-[13px] ${isCurrent ? "font-bold text-[#18181B]" : "text-[#52525B]"}`}
+              className={`text-[13px] max-sm:text-[11px] ${isCurrent ? "font-bold text-(--ds-ink)" : "text-(--ds-ink-2)"}`}
             >
               {num}. {label}
             </span>

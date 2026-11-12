@@ -12,15 +12,15 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-[#4338CA] text-white hover:bg-[#3730A3] disabled:bg-[#818CF8]",
+  primary: "bg-(--ds-primary) text-white hover:bg-(--ds-primary-strong) disabled:opacity-60",
   secondary:
-    "border border-[#D4D4D8] bg-white text-[#18181B] hover:bg-[#F4F4F5] disabled:text-[#A1A1AA]",
-  ghost: "bg-transparent text-[#3F3F46] hover:bg-[#F4F4F5] disabled:text-[#A1A1AA]",
+    "border border-(--ds-line-2) bg-white text-(--ds-ink) hover:bg-(--ds-surface-2) disabled:text-(--ds-ink-3)",
+  ghost: "bg-transparent text-(--ds-ink-2) hover:bg-(--ds-surface-2) disabled:text-(--ds-ink-3)",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
   md: "h-11 px-4 text-[14px]",
-  lg: "h-12.5 px-5 text-[16px]",
+  lg: "h-12.5 px-5 text-[16px] max-sm:h-13.5",
 };
 
 export default function Button({

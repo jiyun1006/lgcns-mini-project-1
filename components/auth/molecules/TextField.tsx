@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, ReactNode } from "react";
+import { X } from "lucide-react";
 
 export type FieldTone = "default" | "error" | "success";
 
@@ -13,15 +14,16 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 const borderClass: Record<FieldTone, string> = {
-  default: "border-[#D4D4D8] focus-within:border-[#4338CA]",
-  error: "border-[#DC2626]",
+  default:
+    "border-(--ds-line-2) focus-within:border-(--ds-primary) focus-within:shadow-[0_0_0_4px_var(--ds-primary-soft)]",
+  error: "border-(--ds-danger)",
   success: "border-[#16A34A]",
 };
 
 const messageClass: Record<FieldTone, string> = {
-  default: "text-[#52525B]",
-  error: "font-semibold text-[#B91C1C]",
-  success: "font-semibold text-[#15803D]",
+  default: "text-(--ds-ink-2)",
+  error: "font-semibold text-(--ds-danger)",
+  success: "font-semibold text-(--ds-ok)",
 };
 
 export default function TextField({
@@ -49,7 +51,7 @@ export default function TextField({
           value={value}
           aria-invalid={tone === "error" || undefined}
           aria-describedby={message ? messageId : undefined}
-          className="h-11.5 min-w-0 flex-1 rounded-[10px] px-3.5 text-[15px] outline-none"
+          className="h-11.5 min-w-0 flex-1 rounded-[10px] px-3.5 text-[15px] outline-none max-sm:h-12.5"
           {...rest}
         />
         {onClear && value ? (
@@ -57,9 +59,9 @@ export default function TextField({
             type="button"
             onClick={onClear}
             aria-label={`${label} 지우기`}
-            className="flex h-11 w-11 items-center justify-center text-[18px] text-[#71717A]"
+            className="flex h-11 w-11 items-center justify-center text-[18px] text-(--ds-ink-3)"
           >
-            ×
+            <X size={16} aria-hidden="true" />
           </button>
         ) : null}
         {rightSlot}

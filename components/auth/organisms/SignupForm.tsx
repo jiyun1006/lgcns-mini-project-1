@@ -1,12 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
-import Alert from "@/components/auth/atoms/Alert";
 import Button from "@/components/auth/atoms/Button";
 import SignupProgress from "@/components/auth/molecules/SignupProgress";
 import AccountStep from "@/components/auth/organisms/signup/AccountStep";
-import DoneStep from "@/components/auth/organisms/signup/DoneStep";
+import DoneStep, { DoneStepAction } from "@/components/auth/organisms/signup/DoneStep";
 import ProfileStep from "@/components/auth/organisms/signup/ProfileStep";
 import TermsStep from "@/components/auth/organisms/signup/TermsStep";
 import { useAvailabilityCheck } from "@/hooks/useAvailabilityCheck";
@@ -18,6 +18,7 @@ import {
   validatePasswordConfirm,
 } from "@/lib/validation/auth";
 import { authApi } from "@/service/auth/authApi";
+import "@/components/design/skins/auth.css";
 
 export type SignupValues = {
   terms: boolean[];
@@ -53,6 +54,8 @@ export default function SignupForm() {
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [needsApproval, setNeedsApproval] = useState(false);
+  // 단계 내용이 들어오는 방향: 다음은 오른쪽에서, 이전은 왼쪽에서 (처음 화면은 움직이지 않음)
+  const [direction, setDirection] = useState<"next" | "prev" | null>(null);
 
   const loginIdCheck = useAvailabilityCheck(values.loginId, validateLoginId, authApi.checkLoginId);
   const emailCheck = useAvailabilityCheck(values.email, validateEmail, authApi.checkEmail);
@@ -84,6 +87,7 @@ export default function SignupForm() {
   const goPrev = () => {
     setShowErrors(false);
     setFormError("");
+    setDirection("prev");
     setStep((prev) => Math.max(1, prev - 1));
   };
 
@@ -94,6 +98,7 @@ export default function SignupForm() {
     }
     setShowErrors(false);
     if (step < 3) {
+      setDirection("next");
       setStep(step + 1);
       return;
     }
@@ -114,6 +119,7 @@ export default function SignupForm() {
         return;
       }
       setNeedsApproval(result.data.needsApproval);
+      setDirection("next");
       setStep(4);
     } catch {
       setFormError("서버와 연결되지 않았어요. 잠시 후 다시 시도해 주세요.");
@@ -123,50 +129,66 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="flex w-full max-w-130 flex-col gap-5">
-      <h1 className="text-center text-[26px] font-extrabold">회원가입</h1>
-      <SignupProgress current={step} />
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        void goNext();
+      }}
+      noValidate
+      className="ds-auth-signup-card"
+    >
+      <div className="ds-auth-signup-top">
+        <h1>회원가입</h1>
+        <SignupProgress current={step} />
+      </div>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          void goNext();
-        }}
-        noValidate
-        className="flex flex-col gap-4.5 rounded-2xl border border-[#E4E4E7] bg-white p-8"
-      >
-        {formError ? <Alert>{formError}</Alert> : null}
+      <div className="ds-auth-signup-body">
+        <div
+          key={step}
+          className={
+            direction === "next"
+              ? "ds-auth-slide-next"
+              : direction === "prev"
+                ? "ds-auth-slide-prev"
+                : undefined
+          }
+        >
+          {step === 1 ? (
+            <TermsStep
+              terms={values.terms}
+              onChange={(terms) => update("terms", terms)}
+              showError={showErrors}
+            />
+          ) : null}
+          {step === 2 ? (
+            <AccountStep
+              values={values}
+              onChange={update}
+              loginIdCheck={loginIdCheck}
+              emailCheck={emailCheck}
+              showErrors={showErrors}
+            />
+          ) : null}
+          {step === 3 ? (
+            <ProfileStep
+              values={values}
+              onChange={update}
+              nicknameCheck={nicknameCheck}
+              showErrors={showErrors}
+            />
+          ) : null}
+          {step === 4 ? (
+            <DoneStep nickname={values.nickname.trim()} needsApproval={needsApproval} />
+          ) : null}
+        </div>
+      </div>
 
-        {step === 1 ? (
-          <TermsStep
-            terms={values.terms}
-            onChange={(terms) => update("terms", terms)}
-            showError={showErrors}
-          />
-        ) : null}
-        {step === 2 ? (
-          <AccountStep
-            values={values}
-            onChange={update}
-            loginIdCheck={loginIdCheck}
-            emailCheck={emailCheck}
-            showErrors={showErrors}
-          />
-        ) : null}
-        {step === 3 ? (
-          <ProfileStep
-            values={values}
-            onChange={update}
-            nicknameCheck={nicknameCheck}
-            showErrors={showErrors}
-          />
-        ) : null}
-        {step === 4 ? (
-          <DoneStep nickname={values.nickname.trim()} needsApproval={needsApproval} />
-        ) : null}
-
+      <div className="ds-auth-signup-foot">
+        <p role="alert" className="ds-auth-foot-error">
+          {formError}
+        </p>
         {step < 4 ? (
-          <div className="flex gap-2.5 border-t border-[#F0F0F2] pt-4.5">
+          <div className="flex gap-2.5">
             <Button
               variant="secondary"
               onClick={goPrev}
@@ -184,8 +206,20 @@ export default function SignupForm() {
               {step === 3 ? "가입하기" : "다음"}
             </Button>
           </div>
-        ) : null}
-      </form>
-    </div>
+        ) : (
+          <DoneStepAction needsApproval={needsApproval} />
+        )}
+        <p
+          className="ds-auth-foot-login"
+          data-hidden={step === 4 || undefined}
+          aria-hidden={step === 4 || undefined}
+        >
+          이미 계정이 있으신가요?{" "}
+          <Link href="/login" tabIndex={step === 4 ? -1 : undefined}>
+            로그인
+          </Link>
+        </p>
+      </div>
+    </form>
   );
 }
