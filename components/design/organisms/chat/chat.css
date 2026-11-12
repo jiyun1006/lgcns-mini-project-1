@@ -1,0 +1,611 @@
+/* 채팅 화면 디자인 (DsChatShell · DsChatSidebar · DsChatMessages · DsChatInput이 함께 씀) */
+
+/* ── 틀 ── */
+.ds-chat {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: var(--ds-font);
+  font-size: 15px;
+}
+
+/* ── 왼쪽 대화 목록 ── */
+.ds-chat-sidebar {
+  display: flex;
+  width: 264px;
+  height: 100%;
+  flex: none;
+  flex-direction: column;
+  padding: 18px 14px;
+  border-right: 1px solid var(--ds-line);
+  background: var(--ds-bg);
+  overflow-y: auto;
+}
+.ds-chat[data-desktop-open="false"] .ds-chat-sidebar {
+  display: none;
+}
+
+.ds-chat-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding-left: 6px;
+}
+.ds-chat-sidebar-head h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ds-chat-icon-button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  place-items: center;
+  border-radius: var(--ds-radius);
+  background: none;
+  color: var(--ds-ink-2);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.ds-chat-icon-button:hover {
+  background: var(--ds-surface-3);
+  color: var(--ds-ink);
+}
+.ds-chat-icon-button svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.75;
+}
+
+.ds-chat-new-button {
+  display: inline-flex;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 22px;
+  border-radius: var(--ds-radius);
+  background: var(--ds-primary);
+  box-shadow: 0 1px 2px rgb(73 56 209 / 0.25);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ds-chat-new-button:hover {
+  background: var(--ds-primary-strong);
+}
+.ds-chat-new-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ds-chat-list-label {
+  margin: 0 6px 8px;
+  color: var(--ds-ink-3);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ds-chat-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ds-chat-list li {
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius);
+  transition: background 0.15s;
+}
+.ds-chat-list li:hover {
+  background: var(--ds-surface-3);
+}
+.ds-chat-list li[data-active] {
+  border-color: var(--ds-line);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-1);
+}
+
+.ds-chat-list-main {
+  min-width: 0;
+  flex: 1;
+  padding: 9px 4px 9px 10px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ds-chat-list-main strong {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds-chat-list li[data-active] .ds-chat-list-main strong {
+  font-weight: 600;
+}
+.ds-chat-list-main small {
+  color: var(--ds-ink-3);
+  font-size: 12px;
+}
+
+.ds-chat-row-button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  place-items: center;
+  border-radius: 8px;
+  background: none;
+  color: var(--ds-ink-3);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    opacity 0.15s;
+}
+.ds-chat-row-button:last-child {
+  margin-right: 4px;
+}
+.ds-chat-row-button:hover {
+  background: var(--ds-surface-2);
+  color: var(--ds-ink);
+}
+.ds-chat-row-button svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.75;
+}
+
+/* 마우스가 있는 기기: 선택 안 된 대화의 연필 · 휴지통은 마우스를 올리거나 키보드로 들어올 때만 */
+@media (hover: hover) {
+  .ds-chat-list li:not([data-active]) .ds-chat-row-button {
+    opacity: 0;
+  }
+  .ds-chat-list li:not([data-active]):hover .ds-chat-row-button,
+  .ds-chat-list li:not([data-active]):focus-within .ds-chat-row-button {
+    opacity: 1;
+  }
+}
+
+.ds-chat-empty {
+  margin: 0 6px;
+  color: var(--ds-ink-3);
+  font-size: 14px;
+}
+
+.ds-chat-list-main:focus-visible,
+.ds-chat-row-button:focus-visible,
+.ds-chat-icon-button:focus-visible,
+.ds-chat-new-button:focus-visible,
+.ds-chat-send-button:focus-visible,
+.ds-chat-to-bottom:focus-visible {
+  outline: 2px solid var(--ds-primary);
+  outline-offset: 2px;
+}
+
+.ds-chat-scrim {
+  display: none;
+}
+
+/* ── 오른쪽 대화 ── */
+.ds-chat-conversation {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex: 1;
+  flex-direction: column;
+  background: var(--ds-surface);
+}
+.ds-chat-conversation-head {
+  display: flex;
+  min-height: 60px;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--ds-line);
+}
+.ds-chat-conversation-head h3 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds-chat-open-button {
+  display: none;
+  border: 1px solid var(--ds-line-2);
+}
+.ds-chat[data-desktop-open="false"] .ds-chat-open-button {
+  display: grid;
+}
+
+/* 말풍선 목록 */
+.ds-chat-messages {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+}
+.ds-chat-messages-inner {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px 32px;
+}
+
+.ds-chat-bubble {
+  max-width: 75%;
+  padding: 14px 16px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.ds-chat-bubble p {
+  margin: 0;
+}
+.ds-chat-bubble[data-role="user"] {
+  align-self: flex-end;
+  border-radius: 18px 18px 4px 18px;
+  background: var(--ds-primary);
+  color: #fff;
+  white-space: pre-wrap;
+}
+.ds-chat-bubble[data-role="assistant"] {
+  align-self: flex-start;
+  border-radius: 18px 18px 18px 4px;
+  background: var(--ds-surface-2);
+}
+
+.ds-chat-bubble-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ds-chat-bubble[data-role="user"] .ds-chat-bubble-head {
+  color: rgb(255 255 255 / 0.85);
+}
+/* EXAONE 이름 앞 작은 마크: 단색 보라 (그라데이션은 팀 로고에만) */
+.ds-chat-bubble[data-role="assistant"] .ds-chat-bubble-head {
+  justify-content: flex-start;
+  gap: 6px;
+  color: var(--ds-ink);
+}
+.ds-chat-bubble[data-role="assistant"] .ds-chat-bubble-head::before {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: var(--ds-primary);
+  content: "";
+}
+
+.ds-chat-edit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.9;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.4);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ds-chat-edit-button:hover:not(:disabled) {
+  opacity: 1;
+  text-decoration-color: #fff;
+}
+.ds-chat-edit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.ds-chat-edit-button svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* 내 말 고치기 (보라 말풍선 안) */
+.ds-chat-edit-box {
+  min-width: min(420px, 65vw);
+}
+.ds-chat-edit-box textarea {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+.ds-chat-edit-box textarea:focus {
+  border-color: var(--ds-primary-line);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.35);
+}
+.ds-chat-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+.ds-chat-edit-cancel,
+.ds-chat-edit-submit {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ds-chat-edit-cancel {
+  border: 1px solid rgb(255 255 255 / 0.5);
+  background: none;
+  color: #fff;
+}
+.ds-chat-edit-cancel:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+.ds-chat-edit-submit {
+  background: var(--ds-surface);
+  color: var(--ds-primary);
+}
+.ds-chat-edit-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* EXAONE 답(마크다운): 회색 말풍선 위에서 읽기 좋게 */
+.ds-chat-bubble .markdown-content {
+  margin-top: 0;
+}
+.ds-chat-bubble .markdown-content code {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--ds-surface);
+  font-size: 0.88em;
+  letter-spacing: 0;
+}
+.ds-chat-bubble .markdown-content pre {
+  border-radius: var(--ds-radius);
+}
+.ds-chat-bubble .markdown-content pre code {
+  padding: 0;
+  background: transparent;
+}
+/* 표: 테두리 상자를 내용 폭에 맞추고, 말풍선보다 넓으면 옆으로 스크롤 (globals.css의 display:block은 그대로) */
+.ds-chat-bubble .markdown-content table {
+  width: max-content;
+  max-width: 100%;
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius);
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--ds-surface);
+  font-size: 13px;
+}
+.ds-chat-bubble .markdown-content th,
+.ds-chat-bubble .markdown-content td {
+  border: 0;
+  border-top: 1px solid var(--ds-line);
+}
+.ds-chat-bubble .markdown-content tr:first-child th,
+.ds-chat-bubble .markdown-content tr:first-child td {
+  border-top: 0;
+}
+.ds-chat-bubble .markdown-content th {
+  background: var(--ds-bg);
+  font-weight: 600;
+}
+.ds-chat-bubble .markdown-content blockquote {
+  border-left: 3px solid var(--ds-line-2);
+  border-radius: 0 8px 8px 0;
+  background: var(--ds-surface);
+  color: var(--ds-ink-2);
+}
+.ds-chat-bubble .markdown-content a {
+  color: var(--ds-primary);
+}
+
+.ds-chat-status {
+  margin: 0;
+  color: var(--ds-ink-3);
+  font-size: 14px;
+}
+.ds-chat-error {
+  margin: 0;
+  color: var(--ds-danger);
+  font-size: 14px;
+}
+
+.ds-chat-empty-chat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.ds-chat-empty-chat h2 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.ds-chat-empty-chat p {
+  margin: 0;
+  color: var(--ds-ink-2);
+}
+
+.ds-chat-to-bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--ds-line);
+  border-radius: 50%;
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-2);
+  color: var(--ds-ink-2);
+  cursor: pointer;
+  transform: translateX(-50%);
+}
+.ds-chat-to-bottom svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── 아래 입력창 ── */
+.ds-chat-footer {
+  flex: none;
+  padding: 16px 32px 20px;
+  border-top: 1px solid var(--ds-line);
+}
+.ds-chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.ds-chat-input-box {
+  display: flex;
+  min-width: 0;
+  min-height: 48px;
+  flex: 1;
+  border: 1px solid var(--ds-line-2);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.ds-chat-input-box:focus-within {
+  border-color: var(--ds-primary);
+  box-shadow: 0 0 0 4px var(--ds-primary-soft);
+}
+.ds-chat-input-box textarea {
+  min-width: 0;
+  min-height: 46px;
+  max-height: 160px;
+  flex: 1;
+  padding: 13px 14px;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  resize: none;
+}
+.ds-chat-input-box textarea::placeholder {
+  color: var(--ds-ink-3);
+}
+.ds-chat-send-button {
+  height: 48px;
+  flex: none;
+  padding: 0 22px;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-primary);
+  box-shadow: 0 1px 2px rgb(73 56 209 / 0.25);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ds-chat-send-button:hover:not(:disabled) {
+  background: var(--ds-primary-strong);
+}
+.ds-chat-send-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* ── 휴대폰: 사이드바는 위에 덮이는 서랍 ── */
+@media (max-width: 640px) {
+  .ds-chat-sidebar,
+  .ds-chat[data-desktop-open="false"] .ds-chat-sidebar {
+    position: absolute;
+    z-index: 20;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    width: 288px;
+    max-width: 85%;
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition:
+      transform 0.28s var(--ds-ease),
+      visibility 0s linear 0.28s;
+  }
+  /* 열렸을 때만 그림자를 준다 (닫힌 서랍의 그림자가 화면에 새지 않게) */
+  .ds-chat[data-mobile-open="true"] .ds-chat-sidebar {
+    visibility: visible;
+    box-shadow: 0 0 40px rgb(23 21 31 / 0.18);
+    transform: none;
+    transition: transform 0.28s var(--ds-ease);
+  }
+  .ds-chat[data-mobile-open="true"] .ds-chat-scrim {
+    position: absolute;
+    z-index: 10;
+    inset: 0;
+    display: block;
+    background: rgb(18 16 30 / 0.4);
+  }
+  .ds-chat-conversation-head {
+    min-height: 52px;
+    padding: 0 12px;
+  }
+  .ds-chat-open-button,
+  .ds-chat[data-desktop-open="false"] .ds-chat-open-button {
+    display: grid;
+  }
+  .ds-chat-messages-inner {
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .ds-chat-bubble {
+    max-width: 88%;
+  }
+  .ds-chat-footer {
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+  .ds-chat-input-box {
+    min-height: 46px;
+  }
+  .ds-chat-send-button {
+    height: 46px;
+    padding: 0 16px;
+  }
+}

@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage, Conversation } from "@/types/chat";
-import ChatSidebar from "@/components/chat/ChatSidebar";
-import ChatMessages from "@/components/chat/ChatMessages";
-import ChatInput from "@/components/chat/ChatInput";
+import DsChatShell from "@/components/design/organisms/chat/DsChatShell";
+import DsChatMessages from "@/components/design/organisms/chat/DsChatMessages";
+import DsChatInput from "@/components/design/organisms/chat/DsChatInput";
 import LoginRequiredNotice from "@/components/auth/molecules/LoginRequiredNotice";
 import { useAuth } from "@/components/auth/providers/AuthProvider";
 
@@ -23,7 +23,6 @@ export default function ChatPage({
   const [question, setQuestion] = useState("");
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
@@ -417,96 +416,42 @@ export default function ChatPage({
     void regenerateAnswer();
   }, [activeId, loadConversations, messages, loading]);
   return (
-    <main
-      style={{
-        display: "flex",
-        width: "100%",
-        height: "100%",
-        overflow: "hidden",
-        fontFamily: "Arial, sans-serif",
-        color: "#222",
-        background: "#fff",
+    <DsChatShell
+      showSidebar={isLoggedIn}
+      sidebar={{
+        conversations,
+        activeId,
+        onCreate: createConversation,
+        onSelect: selectConversation,
+        onRename: renameConversation,
+        onDelete: deleteConversation,
       }}
-    >
-      {sidebarOpen && isLoggedIn && (
-        <ChatSidebar
-          conversations={conversations}
-          activeId={activeId}
-          onCreate={createConversation}
-          onSelect={selectConversation}
-          onRename={renameConversation}
-          onDelete={deleteConversation}
-          onToggle={() => setSidebarOpen(false)}
-        />
-      )}
-
-      <section
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          minWidth: 0,
-          height: "100%",
-        }}
-      >
-        <header
-          style={{
-            minHeight: "64px",
-            padding: "12px 22px",
-            borderBottom: "1px solid #e5e7eb",
-            display: "flex",
-            alignItems: "center",
-            gap: "14px",
-          }}
-        >
-          {!sidebarOpen && isLoggedIn && (
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="사이드바 열기"
-              title="사이드바 열기"
-              style={{
-                width: "40px",
-                height: "40px",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                background: "#fff",
-                cursor: "pointer",
-                fontSize: "20px",
-              }}
-            >
-              ☰
-            </button>
-          )}
-          <h3 style={{ margin: 0, fontSize: "17px", fontWeight: 600 }}>{activeTitle}</h3>
-        </header>
-
-        <ChatMessages
-          messages={messages}
-          initializing={initializing && isLoggedIn}
-          loading={loading}
-          error={error}
-          editingMessageId={editingMessageId}
-          editingContent={editingContent}
-          onEditClick={beginEdit}
-          onEditingContentChange={setEditingContent}
-          onEditCancel={cancelEdit}
-          onEditSubmit={submitEdit}
-        />
-
-        {isLoggedIn ? (
-          <ChatInput
+      title={activeTitle}
+      footer={
+        isLoggedIn ? (
+          <DsChatInput
             question={question}
             loading={loading || initializing}
             onQuestionChange={setQuestion}
             onSubmit={() => askQuestion(question)}
           />
         ) : (
-          <div style={{ padding: "20px 25px", borderTop: "1px solid #ddd" }}>
-            <LoginRequiredNotice message="로그인하고 EXAONE과 대화를 시작해 보세요." />
-          </div>
-        )}
-      </section>
-    </main>
+          <LoginRequiredNotice message="로그인하고 EXAONE과 대화를 시작해 보세요." />
+        )
+      }
+    >
+      <DsChatMessages
+        messages={messages}
+        initializing={initializing && isLoggedIn}
+        loading={loading}
+        error={error}
+        editingMessageId={editingMessageId}
+        editingContent={editingContent}
+        onEditClick={beginEdit}
+        onEditingContentChange={setEditingContent}
+        onEditCancel={cancelEdit}
+        onEditSubmit={submitEdit}
+      />
+    </DsChatShell>
   );
 }
