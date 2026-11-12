@@ -22,6 +22,8 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
   // 스트리밍 중인 대화의 메시지를 따로 보관 (다른 채팅에 갔다 와도 이어서 보이도록)
   const activeIdRef = useRef<string | null>(null);
   const streamRef = useRef<{ conversationId: string; messages: ChatMessage[] } | null>(null);
+  // 이미 재생성을 요청한 메시지 ID
+  const retryingMessageIdsRef = useRef(new Set<string>());
   useEffect(() => {
     activeIdRef.current = activeId;
   }, [activeId]);
@@ -210,6 +212,17 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
         if (activeIdRef.current === stream.conversationId) setMessages(stream.messages);
       }
 
+      // DB에 저장된 실제 메시지 ID와 답변 내용으로 화면 갱신
+      const refresh = await fetch(`/api/conversations?id=${targetConversationId}`);
+
+      if (refresh.ok) {
+        const data = (await refresh.json()) as Conversation;
+
+        if (activeIdRef.current === targetConversationId) {
+          setMessages(data.messages ?? []);
+        }
+      }
+
       await loadConversations();
     } catch (err) {
       const stream = streamRef.current;
@@ -222,7 +235,9 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
         const refresh = await fetch(`/api/conversations?id=${targetConversationId}`);
         if (refresh.ok) {
           const data = (await refresh.json()) as Conversation;
-          setMessages(data.messages ?? []);
+          if (activeIdRef.current === targetConversationId) {
+            setMessages(data.messages ?? []);
+          }
         }
       }
       setError(err instanceof Error ? err.message : "오류 발생");
@@ -272,25 +287,94 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
     conversations.find((conversation) => conversation.id === activeId)?.title ?? "새 대화";
 
   useEffect(() => {
-    if (loading) return; // 지금 이 화면에서 스트리밍 중이면 불필요
-    const last = messages[messages.length - 1];
-    if (!activeId || last?.role !== "USER") return;
+    if (!activeId || loading) return;
 
-    let tries = 0;
-    const timer = setInterval(async () => {
-      tries += 1;
-      if (tries > 40) return clearInterval(timer); // 최대 약 2분
-      const res = await fetch(`/api/conversations?id=${activeId}`);
-      if (!res.ok) return;
-      const data = (await res.json()) as Conversation;
-      const lastMsg = data.messages?.[data.messages.length - 1];
-      if (lastMsg?.role === "ASSISTANT") {
-        setMessages(data.messages ?? []);
-        clearInterval(timer);
+    // content가 비어 있는 실제 ASSISTANT 메시지 찾기
+    // temp-ai로 시작하는 임시 메시지는 제외
+    const pendingMessage = messages.find(
+      (message) =>
+        message.role === "ASSISTANT" &&
+        message.content.trim() === "" &&
+        !message.id.startsWith("temp-"),
+    );
+
+    if (!pendingMessage) return;
+
+    // 이미 요청한 메시지라면 중복 요청하지 않음
+    if (retryingMessageIdsRef.current.has(pendingMessage.id)) {
+      return;
+    }
+
+    const targetConversationId = activeId;
+    const targetMessageId = pendingMessage.id;
+
+    retryingMessageIdsRef.current.add(targetMessageId);
+
+    setLoading(true);
+    setError("");
+
+    const regenerateAnswer = async () => {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            conversationId: targetConversationId,
+            assistantMessageId: targetMessageId,
+          }),
+        });
+
+        if (!response.ok || !response.body) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || "답변 재생성 실패");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        let answer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) break;
+
+          answer += decoder.decode(value, { stream: true });
+
+          if (activeIdRef.current === targetConversationId) {
+            setMessages((prev) =>
+              prev.map((message) =>
+                message.id === targetMessageId ? { ...message, content: answer } : message,
+              ),
+            );
+          }
+        }
+
+        answer += decoder.decode();
+
+        // 스트리밍이 끝나면 DB 데이터로 최종 갱신
+        const refresh = await fetch(`/api/conversations?id=${targetConversationId}`);
+
+        if (refresh.ok) {
+          const data = (await refresh.json()) as Conversation;
+
+          if (activeIdRef.current === targetConversationId) {
+            setMessages(data.messages ?? []);
+          }
+        }
+
+        await loadConversations();
+      } catch (err) {
+        console.error("답변 재생성 실패:", err);
+        setError(err instanceof Error ? err.message : "답변 재생성 실패");
+      } finally {
+        setLoading(false);
       }
-    }, 3000);
+    };
 
-    return () => clearInterval(timer);
+    void regenerateAnswer();
   }, [activeId, messages, loading]);
   return (
     <main
