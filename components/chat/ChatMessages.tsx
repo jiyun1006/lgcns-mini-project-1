@@ -8,6 +8,12 @@ type ChatMessagesProps = {
   initializing: boolean;
   loading: boolean;
   error: string;
+  editingMessageId: string | null;
+  editingContent: string;
+  onEditClick: (message: ChatMessage) => void;
+  onEditingContentChange: (value: string) => void;
+  onEditCancel: () => void;
+  onEditSubmit: () => void;
 };
 
 function ScrollToBottomButton() {
@@ -45,6 +51,12 @@ export default function ChatMessages({
   initializing,
   loading,
   error,
+  editingMessageId,
+  editingContent,
+  onEditClick,
+  onEditingContentChange,
+  onEditCancel,
+  onEditSubmit,
 }: ChatMessagesProps) {
   return (
     <StickToBottom
@@ -98,8 +110,93 @@ export default function ChatMessages({
                   overflowWrap: "anywhere",
                 }}
               >
-                <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
-                {msg.role === "ASSISTANT" ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "16px",
+                    marginBottom: "6px",
+                  }}
+                >
+                  <strong>{msg.role === "USER" ? "나" : "EXAONE"}</strong>
+                  {msg.role === "USER" && (
+                    <button
+                      type="button"
+                      onClick={() => onEditClick(msg)}
+                      disabled={loading || editingMessageId !== null}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        color: "#2563eb",
+                        cursor: loading || editingMessageId !== null ? "not-allowed" : "pointer",
+                        opacity: loading || editingMessageId !== null ? 0.5 : 1,
+                        fontSize: "13px",
+                      }}
+                    >
+                      수정
+                    </button>
+                  )}
+                </div>
+                {editingMessageId === msg.id ? (
+                  <div style={{ minWidth: "min(420px, 65vw)" }}>
+                    <textarea
+                      value={editingContent}
+                      onChange={(event) => onEditingContentChange(event.target.value)}
+                      rows={Math.max(3, Math.min(8, editingContent.split("\n").length + 1))}
+                      autoFocus
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        boxSizing: "border-box",
+                        padding: "10px",
+                        border: "1px solid #93c5fd",
+                        borderRadius: "8px",
+                        resize: "vertical",
+                        font: "inherit",
+                        lineHeight: 1.5,
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: "8px",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={onEditCancel}
+                        style={{
+                          padding: "7px 12px",
+                          border: "1px solid #d1d5db",
+                          borderRadius: "7px",
+                          background: "#fff",
+                          cursor: "pointer",
+                        }}
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="button"
+                        onClick={onEditSubmit}
+                        disabled={!editingContent.trim() || loading}
+                        style={{
+                          padding: "7px 12px",
+                          border: "none",
+                          borderRadius: "7px",
+                          background: "#2563eb",
+                          color: "#fff",
+                          cursor: "pointer",
+                          opacity: !editingContent.trim() || loading ? 0.5 : 1,
+                        }}
+                      >
+                        수정 후 재생성
+                      </button>
+                    </div>
+                  </div>
+                ) : msg.role === "ASSISTANT" ? (
                   <div className="markdown-content">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
