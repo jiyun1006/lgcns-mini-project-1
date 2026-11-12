@@ -130,6 +130,11 @@ export async function changeBoard(body: Record<string, unknown>, userId: string,
       case "deletePost": {
         requireOwner(post.authorId, userId);
 
+        // NoAction 자기 참조 관계에서 부모 댓글 삭제가 막히지 않도록 답글부터 제거한다.
+        await tx.comment.deleteMany({
+          where: { postId: id, parentId: { not: null } },
+        });
+
         await tx.comment.deleteMany({
           where: { postId: id },
         });
