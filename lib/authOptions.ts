@@ -5,11 +5,22 @@ import { EXPIRES_IN_SECONDS, signAccessToken } from "@/lib/accessJwt";
 import { springAuthLogin } from "@/service/spring/springAuthService";
 import { makeLoginId, toLoginEmail } from "@/lib/loginId";
 import { prisma } from "@/lib/prisma";
+import { matchApiUrl } from "@/config/apiuri";
+import { springFetch } from "@/lib/fetchClients";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt", maxAge: EXPIRES_IN_SECONDS },
   pages: { signIn: "/login" },
+  events: {
+    // 로그아웃하면 강사님 서버의 토큰도 못 쓰게 해요. 실패해도 우리 로그아웃은 그대로 돼요
+    async signOut({ token }) {
+      if (!token?.springAccessToken) return;
+      await springFetch.post<null>(matchApiUrl.auth.logout, undefined, {
+        headers: { Authorization: `Bearer ${token.springAccessToken}` },
+      });
+    },
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
