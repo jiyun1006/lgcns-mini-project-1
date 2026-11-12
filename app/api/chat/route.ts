@@ -26,6 +26,9 @@ export async function POST(req: Request) {
     const content = raw.trim();
 
     const user = await getCurrentUser();
+    if (!user) {
+      return Response.json({ error: "로그인이 필요해요." }, { status: 401 });
+    }
 
     // 2. 대화방 찾기 (없으면 새로 만들기)
     const conv = conversationId
