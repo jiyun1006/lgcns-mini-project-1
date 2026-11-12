@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { selectActivity } from "@/lib/mypage/activity";
 
 export default function ActivityCard() {
-  const { posts } = useBoard();
-  const activity = selectActivity(posts);
+  const { posts, user } = useBoard();
+  const activity = selectActivity(posts, user?.name ?? "");
   const tabs = [
     {
       value: "posts",

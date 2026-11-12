@@ -5,6 +5,8 @@ import type { ChatMessage, Conversation } from "@/types/chat";
 import ChatSidebar from "@/components/chat/ChatSidebar";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatInput from "@/components/chat/ChatInput";
+import LoginRequiredNotice from "@/components/auth/molecules/LoginRequiredNotice";
+import { useAuth } from "@/components/auth/providers/AuthProvider";
 
 export default function ChatPage({ initialId }: { initialId: string | null }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -18,6 +20,7 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState("");
+  const { isLoggedIn } = useAuth();
 
   // 스트리밍 중인 대화의 메시지를 따로 보관 (다른 채팅에 갔다 와도 이어서 보이도록)
   const activeIdRef = useRef<string | null>(null);
@@ -268,6 +271,10 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
   // 최초 페이지 로딩
   useEffect(() => {
     const initialize = async () => {
+      if (!isLoggedIn) {
+        setInitializing(false);
+        return;
+      }
       try {
         const data = await loadConversations();
         // 바뀐 부분: 맨 위(data[0]) 대신 URL의 id를 먼저 찾는다
@@ -388,7 +395,7 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
         background: "#fff",
       }}
     >
-      {sidebarOpen && (
+      {sidebarOpen && isLoggedIn && (
         <ChatSidebar
           conversations={conversations}
           activeId={activeId}
@@ -419,7 +426,7 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
             gap: "14px",
           }}
         >
-          {!sidebarOpen && (
+          {!sidebarOpen && isLoggedIn && (
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
@@ -454,12 +461,18 @@ export default function ChatPage({ initialId }: { initialId: string | null }) {
           onEditSubmit={submitEdit}
         />
 
-        <ChatInput
-          question={question}
-          loading={loading}
-          onQuestionChange={setQuestion}
-          onSubmit={() => askQuestion(question)}
-        />
+        {isLoggedIn ? (
+          <ChatInput
+            question={question}
+            loading={loading}
+            onQuestionChange={setQuestion}
+            onSubmit={() => askQuestion(question)}
+          />
+        ) : (
+          <div style={{ padding: "20px 25px", borderTop: "1px solid #ddd" }}>
+            <LoginRequiredNotice message="로그인하고 EXAONE과 대화를 시작해 보세요." />
+          </div>
+        )}
       </section>
     </main>
   );

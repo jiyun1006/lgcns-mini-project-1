@@ -10,7 +10,7 @@ export async function readBoard(userId: string, db = prisma): Promise<BoardPost[
     },
     include: {
       author: {
-        select: { name: true },
+        select: { name: true, isProfilePublic: true },
       },
       likes: {
         select: { userId: true },
@@ -66,6 +66,8 @@ export async function readBoard(userId: string, db = prisma): Promise<BoardPost[
       tags: post.tags,
       author: post.author.name,
       authorId: post.authorId,
+      authorProfileImageUrl:
+        (post.author.isProfilePublic ?? true) ? `/api/users/${post.authorId}/profile-image` : null,
       createdAt: post.createdAt.toISOString(),
       viewCount: post.viewCount,
       likeCount: post.likes.length,
