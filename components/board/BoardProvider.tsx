@@ -12,8 +12,6 @@ import {
 import { usePathname } from "next/navigation";
 import type { BoardPost } from "@/types/board";
 import type { PostInput } from "@/lib/board/logic";
-import LoginRequiredNotice from "@/components/auth/molecules/LoginRequiredNotice";
-import { useAuth } from "@/components/auth/providers/AuthProvider";
 
 type User = {
   id: string;
@@ -98,7 +96,6 @@ export default function BoardProvider({ children }: { children: ReactNode }) {
   const path = usePathname();
 
   const isBoard = path === "/posts" || path.startsWith("/posts/");
-  const { isLoggedIn } = useAuth();
 
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [user, setUser] = useState<User | null>(null);
@@ -130,7 +127,7 @@ export default function BoardProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   useEffect(() => {
-    if (!isBoard || !isLoggedIn) return;
+    if (!isBoard) return;
 
     let active = true;
 
@@ -156,7 +153,7 @@ export default function BoardProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [isBoard, isLoggedIn]);
+  }, [isBoard]);
 
   useEffect(() => {
     if (!notice) return;
@@ -213,13 +210,7 @@ export default function BoardProvider({ children }: { children: ReactNode }) {
 
   let content = children;
 
-  if (isBoard && !isLoggedIn) {
-    content = (
-      <main className="board-main">
-        <LoginRequiredNotice message="로그인하고 게시판을 이용해 보세요." />
-      </main>
-    );
-  } else if (isBoard && loading) {
+  if (isBoard && loading) {
     content = (
       <main className="board-main" role="status">
         DB에서 게시글을 불러오는 중이에요…

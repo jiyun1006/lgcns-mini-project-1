@@ -7,11 +7,15 @@ export async function GET() {
   await connection();
 
   try {
-    const user = await boardUser();
+    // 글 읽기는 비회원도 가능. 로그인 안 했으면(401) user를 null로 두고, 다른 에러는 그대로 던진다
+    const user = await boardUser().catch((error: unknown) => {
+      if (error instanceof BoardError && error.status === 401) return null;
+      throw error;
+    });
 
     return Response.json(
       {
-        posts: await readBoard(user.id),
+        posts: await readBoard(user?.id ?? ""),
         user,
       },
       {
