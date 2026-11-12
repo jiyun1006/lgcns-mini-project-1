@@ -46,9 +46,9 @@ export default function TagInput({ id, tags, onChange }: TagInputProps) {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.nativeEvent.isComposing) return; // 한글 조합 중 Enter는 무시
+    if (e.nativeEvent.isComposing) return;
     if (e.key === "Enter") {
-      e.preventDefault(); // 폼 제출(다음 단계)로 넘어가지 않게
+      e.preventDefault();
       if (draft.trim()) {
         addTags([draft]);
         setDraft("");
@@ -89,7 +89,7 @@ export default function TagInput({ id, tags, onChange }: TagInputProps) {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={tags.length ? "" : "예: 프롬프트, 코딩, 공부"}
-          className="h-[30px] min-w-[140px] flex-1 bg-transparent text-[15px] outline-none"
+          className="h-7.5 min-w-35 flex-1 bg-transparent text-[15px] outline-none"
         />
       </div>
       {tags.length === 0 ? (

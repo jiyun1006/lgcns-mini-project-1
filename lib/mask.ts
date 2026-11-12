@@ -1,4 +1,3 @@
-// 앞 1~2글자만 보여 주고 나머지는 *** (길이도 숨겨요)
 function maskPart(value: string) {
   const shown = Math.min(2, Math.max(1, value.length - 1));
   return `${value.slice(0, shown)}***`;

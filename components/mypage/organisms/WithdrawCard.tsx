@@ -14,7 +14,7 @@ export default function WithdrawCard() {
   const [confirmText, setConfirmText] = useState("");
 
   const handleWithdraw = () => {
-    // 강사님 서버에 본인 탈퇴 API가 없어요(관리자용만). 지금은 요청 방법만 안내해요
+    // 탈퇴 API가 없음. 지금은 요청 방법만 안내한다.
     setIsRequested(true);
   };
 

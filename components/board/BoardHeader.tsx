@@ -49,7 +49,7 @@ export default function BoardHeader() {
           >
             <Avatar size="lg">
               {imageUrl && <AvatarImage src={imageUrl} alt="" />}
-              <AvatarFallback className="bg-[#e3e6ff] font-bold text-[var(--accent)]">
+              <AvatarFallback className="bg-[#e3e6ff] font-bold text-(--accent)">
                 {name?.slice(0, 1) ?? "나"}
               </AvatarFallback>
             </Avatar>

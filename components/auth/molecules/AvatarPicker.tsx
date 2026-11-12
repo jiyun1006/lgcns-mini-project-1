@@ -11,7 +11,7 @@ export default function AvatarPicker({ initial, previewUrl, onChange }: AvatarPi
   };
 
   return (
-    <label className="relative block h-[88px] w-[88px] shrink-0 cursor-pointer rounded-full">
+    <label className="relative block h-22 w-22 shrink-0 cursor-pointer rounded-full">
       <input type="file" accept="image/png,image/jpeg" onChange={handlePick} className="sr-only" />
       <span className="sr-only">프로필 사진 올리기 (선택)</span>
       {previewUrl ? (
@@ -19,12 +19,12 @@ export default function AvatarPicker({ initial, previewUrl, onChange }: AvatarPi
         <img
           src={previewUrl}
           alt="선택한 프로필 사진"
-          className="h-[88px] w-[88px] rounded-full object-cover"
+          className="h-22 w-22 rounded-full object-cover"
         />
       ) : (
         <span
           aria-hidden="true"
-          className="flex h-[88px] w-[88px] items-center justify-center rounded-full border-2 border-dashed border-[#A5B4FC] bg-[#E0E7FF] text-[30px] font-extrabold text-[#3730A3]"
+          className="flex h-22 w-22 items-center justify-center rounded-full border-2 border-dashed border-[#A5B4FC] bg-[#E0E7FF] text-[30px] font-extrabold text-[#3730A3]"
         >
           {initial || "?"}
         </span>

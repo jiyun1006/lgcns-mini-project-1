@@ -50,8 +50,8 @@ export default function AccountStep({
   const isConfirmOk = values.passwordConfirm !== "" && !confirmError;
 
   return (
-    <fieldset className="flex flex-col gap-[18px]">
-      <legend className="mb-[18px] text-[19px] font-bold">계정 정보</legend>
+    <fieldset className="flex flex-col gap-4.5">
+      <legend className="mb-4.5 text-[19px] font-bold">계정 정보</legend>
 
       <TextField
         id="signup-loginId"

@@ -13,7 +13,7 @@ export default function PasswordStrength({ password }: { password: string }) {
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <div aria-hidden="true" className="grid w-[66px] grid-cols-3 gap-[3px]">
+      <div aria-hidden="true" className="grid w-16.5 grid-cols-3 gap-0.75">
         {[1, 2, 3].map((n) => (
           <span key={n} className={`h-1 rounded-sm ${n <= level ? info.bar : "bg-[#E4E4E7]"}`} />
         ))}

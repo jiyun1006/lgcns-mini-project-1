@@ -17,7 +17,7 @@ export default function Alert({
   return (
     <div
       role={tone === "error" ? "alert" : "status"}
-      className={`rounded-[10px] border px-[14px] py-3 text-[14px] ${toneClass[tone]}`}
+      className={`rounded-[10px] border px-3.5 py-3 text-[14px] ${toneClass[tone]}`}
     >
       {children}
     </div>
