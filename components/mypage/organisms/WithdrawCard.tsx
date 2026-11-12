@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { UserX } from "lucide-react";
 import { MyPageButton, buttonVariants } from "@/components/mypage/atoms/MyPageButton";
@@ -11,12 +10,12 @@ import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/comp
 const CONFIRM_TEXT = "탈퇴";
 
 export default function WithdrawCard() {
-  const router = useRouter();
+  const [isRequested, setIsRequested] = useState(false);
   const [confirmText, setConfirmText] = useState("");
 
   const handleWithdraw = () => {
-    // shortcut: 실제 탈퇴(유저 삭제·재가입 제한 기록)는 인증·정책 확정 후 구현
-    router.replace("/login");
+    // 강사님 서버에 본인 탈퇴 API가 없어요(관리자용만). 지금은 요청 방법만 안내해요
+    setIsRequested(true);
   };
 
   return (
@@ -28,9 +27,16 @@ export default function WithdrawCard() {
           </span>
           회원탈퇴
         </CardTitle>
-        <CardDescription>계정과 활동 정보를 삭제합니다</CardDescription>
+        <CardDescription>관리자에게 문의 바랍니다</CardDescription>
         <CardAction>
-          <AlertDialog.Root onOpenChange={(open) => !open && setConfirmText("")}>
+          <AlertDialog.Root
+            onOpenChange={(open) => {
+              if (!open) {
+                setConfirmText("");
+                setIsRequested(false);
+              }
+            }}
+          >
             <AlertDialog.Trigger className={buttonVariants({ variant: "destructive" })}>
               회원탈퇴
             </AlertDialog.Trigger>
@@ -41,8 +47,9 @@ export default function WithdrawCard() {
                   정말 탈퇴할까요?
                 </AlertDialog.Title>
                 <AlertDialog.Description className="text-sm text-stone-600">
-                  탈퇴 후 3개월간 같은 이메일로 재가입할 수 없어요. 계속하려면 아래에 &quot;
-                  {CONFIRM_TEXT}&quot;를 입력해 주세요.
+                  {isRequested
+                    ? "지금은 직접 탈퇴할 수 없어요. 관리자에게 가입 이메일과 함께 문의해주세요."
+                    : `탈퇴하면 계정과 활동 정보가 사라져요. 계속하려면 아래에 "${CONFIRM_TEXT}"를 입력해 주세요.`}
                 </AlertDialog.Description>
                 <FormField
                   id="withdrawConfirm"
