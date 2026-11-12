@@ -390,17 +390,90 @@
 }
 .comments {
   border-top: 1px solid var(--line);
-  padding-top: 28px;
+  margin-top: 32px;
+  padding-top: 26px;
 }
 .comment {
-  margin: 28px 0;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+.comment-avatar {
+  width: 30px;
+  height: 30px;
+}
+.comment-avatar-fallback {
+  background: #d7f7e6;
+  color: #236b43;
+  font-weight: 700;
+}
+.comment-avatar-reply {
+  width: 24px;
+  height: 24px;
+}
+.comment:nth-of-type(3n + 2) .comment-avatar-fallback {
+  background: #f8d9ed;
+  color: #8e3769;
+}
+.comment:nth-of-type(3n) .comment-avatar-fallback {
+  background: #e2e4ff;
+  color: #4636b2;
+}
+.comment-content {
+  min-width: 0;
+}
+.comment-header,
+.comment-author-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.comment-header {
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.comment-author-meta time {
+  color: #777780;
+  font-size: 12px;
+}
+.comment-reply-mark {
+  color: #777780;
+}
+.comment-text {
+  margin: 0 0 8px !important;
+}
+.board-shell .comment-reply-button {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent);
+  padding: 3px 0;
+  font-weight: 700;
+}
+.board-shell .comment-actions {
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+.board-shell .comment-actions button {
+  border: 0;
+  background: transparent;
+  padding: 3px 0;
+  color: #686870;
+  font-size: 12px;
+}
+.board-shell .comment-actions .comment-delete {
+  color: #b32b35;
 }
 .reply {
-  margin: 14px 0 0 28px;
-  padding: 16px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 12px 14px;
   border: 1px solid var(--line);
   background: white;
-  border-radius: 9px;
+  border-radius: 12px;
 }
 .form-top {
   display: grid;
@@ -582,19 +655,27 @@
   padding-left: 24px;
 }
 .comments textarea {
-  min-height: 90px;
+  min-height: 98px;
+  border-radius: 12px;
 }
-.comment .section-heading {
-  margin-bottom: 8px;
+.comments > form .form-actions {
+  margin-top: 12px;
+  padding-top: 0;
+  border-top: 0;
 }
-.comment .actions button {
-  font-size: 12px;
-  padding: 5px 10px;
+.board-shell .comment-submit {
+  background: #171719;
+  border-color: #171719;
+  color: #fff;
+  font-weight: 700;
 }
-.small-heading small {
-  font-weight: 400;
-  margin-left: 12px;
-  font-size: 11px;
+.reply-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.reply-form button {
+  justify-self: end;
 }
 @media (max-width: 600px) {
   .board-header nav {
@@ -602,10 +683,6 @@
   }
   .board-header nav a {
     padding: 8px;
-  }
-  .small-heading small {
-    display: block;
-    margin-left: 0;
   }
   .board-shell .brand {
     font-size: 16px;

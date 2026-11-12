@@ -19,7 +19,7 @@ export async function readBoard(userId: string, db = prisma): Promise<BoardPost[
         orderBy: { createdAt: "asc" },
         include: {
           author: {
-            select: { name: true },
+            select: { name: true, isProfilePublic: true },
           },
         },
       },
@@ -34,6 +34,11 @@ export async function readBoard(userId: string, db = prisma): Promise<BoardPost[
         id: comment.id,
         author: comment.author.name,
         authorId: comment.authorId,
+        authorProfileImageUrl:
+          (comment.author.isProfilePublic ?? true)
+            ? `/api/users/${comment.authorId}/profile-image`
+            : null,
+        createdAt: comment.createdAt.toISOString(),
         content: comment.deleted ? "" : comment.content,
         deleted: comment.deleted,
         replies: [],
