@@ -10,12 +10,14 @@ export type SignupInput = {
   nickname: string;
   interests: string[];
   marketingAgreed: boolean;
+  loginId: string;
 };
 
 export type AuthApi = {
   login(input: LoginInput): Promise<ApiResult>;
   checkEmail(email: string): Promise<ApiResult<{ available: boolean }>>;
   checkNickname(nickname: string): Promise<ApiResult<{ available: boolean }>>;
+  checkLoginId(loginId: string): Promise<ApiResult<{ available: boolean }>>;
   signup(input: SignupInput): Promise<ApiResult<{ needsApproval: boolean }>>;
 };
 

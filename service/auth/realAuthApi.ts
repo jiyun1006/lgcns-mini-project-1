@@ -1,7 +1,13 @@
 import { signIn } from "next-auth/react";
 
+import {
+  checkEmailAction,
+  checkLoginIdAction,
+  checkNicknameAction,
+  signupAction,
+} from "@/actions/authActions";
+
 import type { AuthApi } from "./authApi";
-import { mockAuthApi } from "./mockAuthApi";
 
 const LOGIN_FAILED_MESSAGE = "이메일 또는 비밀번호가 틀렸어요. 다시 확인해 주세요.";
 
@@ -20,8 +26,15 @@ export const realAuthApi: AuthApi = {
     return { ok: true, data: null };
   },
 
-  // ⏸ 회원가입 쪽은 3장에서 바꿔요. 그때까지 가짜를 그대로 써요
-  checkEmail: mockAuthApi.checkEmail,
-  checkNickname: mockAuthApi.checkNickname,
-  signup: mockAuthApi.signup,
+  checkEmail: checkEmailAction,
+  checkNickname: checkNicknameAction,
+  checkLoginId: checkLoginIdAction,
+
+  async signup(input) {
+    const result = await signupAction(input);
+    if (!result.ok || result.data.needsApproval) return result;
+    // 가입 성공 → 바로 로그인 (목업: "가입 전에 보던 페이지로 돌아갈게요")
+    await signIn("credentials", { email: input.email, password: input.password, redirect: false });
+    return result;
+  },
 };
