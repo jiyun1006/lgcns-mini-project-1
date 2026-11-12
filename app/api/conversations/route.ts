@@ -9,6 +9,9 @@ const conversationSelect = { id: true, title: true, createdAt: true, updatedAt: 
 export async function GET(req: Request) {
   try {
     const user = await getCurrentUser();
+    if (!user) {
+      return Response.json({ error: "로그인이 필요해요." }, { status: 401 });
+    }
     const id = new URL(req.url).searchParams.get("id");
 
     if (id !== null) {
@@ -49,6 +52,9 @@ export async function GET(req: Request) {
 export async function POST() {
   try {
     const user = await getCurrentUser();
+    if (!user) {
+      return Response.json({ error: "로그인이 필요해요." }, { status: 401 });
+    }
     const conversation = await prisma.conversation.create({
       data: { userId: user.id },
       select: conversationSelect,
@@ -72,6 +78,9 @@ export async function PATCH(req: Request) {
     }
 
     const user = await getCurrentUser();
+    if (!user) {
+      return Response.json({ error: "로그인이 필요해요." }, { status: 401 });
+    }
     const result = await prisma.conversation.updateMany({
       where: { id, userId: user.id },
       data: { title },
@@ -97,6 +106,9 @@ export async function DELETE(req: Request) {
     }
 
     const user = await getCurrentUser();
+    if (!user) {
+      return Response.json({ error: "로그인이 필요해요." }, { status: 401 });
+    }
     const conversation = await prisma.conversation.findFirst({
       where: { id, userId: user.id },
       select: { id: true },

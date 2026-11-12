@@ -2,7 +2,9 @@
 
 import { Prisma } from "@prisma/client";
 import { refresh } from "next/cache";
+import { matchApiUrl } from "@/config/apiuri";
 import { getCurrentUser } from "@/lib/current-user";
+import { springFetch } from "@/lib/fetchClients";
 import { prisma } from "@/lib/prisma";
 import {
   MAX_PROFILE_IMAGE_BYTES,
@@ -10,6 +12,9 @@ import {
   toProfileImageDataUrl,
 } from "@/lib/mypage/profileImage";
 import { normalizeInterests, validateIntro } from "@/lib/mypage/validateIntro";
+import { validatePasswordChange, type PasswordChangeInput } from "@/lib/mypage/validatePassword";
+import { getSpringAccessToken } from "@/lib/springToken";
+import { validateNickname } from "@/lib/validation/auth";
 import type {
   IntroFormState,
   PrivacyFormState,
@@ -19,7 +24,6 @@ import type {
 
 const LOGIN_ID_PATTERN = /^[a-z0-9_]{1,20}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_NICKNAME_LENGTH = 20;
 const MAX_EMAIL_LENGTH = 254;
 
 // 대상은 항상 현재 사용자 본인. 클라이언트가 보낸 id는 받지 않는다.
@@ -36,9 +40,8 @@ export async function updateProfile(
   const recoveryEmail = read("recoveryEmail").toLowerCase();
 
   const errors: Partial<Record<ProfileField, string>> = {};
-  if (!nickname) errors.nickname = "닉네임은 공백만으로 저장할 수 없습니다.";
-  else if (nickname.length > MAX_NICKNAME_LENGTH)
-    errors.nickname = `닉네임은 ${MAX_NICKNAME_LENGTH}자 이하로 입력해주세요.`;
+  const nicknameError = validateNickname(nickname);
+  if (nicknameError) errors.nickname = nicknameError;
   if (!loginId) errors.loginId = "아이디는 공백만으로 저장할 수 없습니다.";
   else if (!LOGIN_ID_PATTERN.test(loginId))
     errors.loginId = "아이디는 영문 소문자, 숫자, _만 사용해 1~20자로 입력해주세요.";
@@ -62,6 +65,7 @@ export async function updateProfile(
   if (Object.keys(errors).length) return { errors };
 
   const user = await getCurrentUser();
+  if (!user) return { errors: { nickname: "로그인이 필요해요." } };
 
   // shortcut: loginId에 unique 인덱스가 없어 동시 저장 시 중복될 수 있음, 백필 후 @unique로 바꾸면 P2002로 처리
   const taken = await prisma.user.findFirst({
@@ -100,6 +104,8 @@ export async function updateIntro(
   if (errors.bio || errors.interests) return { errors };
 
   const user = await getCurrentUser();
+  if (!user) return { errors: { bio: "로그인이 필요해요." } };
+
   await prisma.user.update({
     where: { id: user.id },
     data: { bio: bio || null, interests },
@@ -115,6 +121,8 @@ export async function updatePrivacy(
   formData: FormData,
 ): Promise<PrivacyFormState> {
   const user = await getCurrentUser();
+  if (!user) return { ok: false };
+
   await prisma.user.update({
     where: { id: user.id },
     data: {
@@ -126,4 +134,28 @@ export async function updatePrivacy(
 
   refresh();
   return { ok: true };
+}
+
+// 비밀번호 변경 : 비밀번호는 강사님 Spring에만 있어서 Spring API로 바꿔요
+export async function changePassword(
+  input: PasswordChangeInput,
+): Promise<{ ok: boolean; message: string }> {
+  const error = validatePasswordChange(input);
+  if (error) return { ok: false, message: error };
+
+  const springToken = await getSpringAccessToken();
+  if (!springToken) return { ok: false, message: "로그인이 필요해요. 다시 로그인해 주세요." };
+
+  const response = await springFetch.post<null>(
+    matchApiUrl.auth.changePassword,
+    { currentPassword: input.currentPassword, newPassword: input.newPassword },
+    { headers: { Authorization: `Bearer ${springToken}` } },
+  );
+  if (!response.success) {
+    return {
+      ok: false,
+      message: response.message || "비밀번호를 바꾸지 못했어요. 잠시 후 다시 시도해 주세요.",
+    };
+  }
+  return { ok: true, message: "비밀번호를 바꿨어요. 다음 로그인부터 새 비밀번호를 써요." };
 }
