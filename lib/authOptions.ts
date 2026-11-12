@@ -5,11 +5,23 @@ import { EXPIRES_IN_SECONDS, signAccessToken } from "@/lib/accessJwt";
 import { springAuthLogin } from "@/service/spring/springAuthService";
 import { makeLoginId, toLoginEmail } from "@/lib/loginId";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { matchApiUrl } from "@/config/apiuri";
+import { springFetch } from "@/lib/fetchClients";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt", maxAge: EXPIRES_IN_SECONDS },
   pages: { signIn: "/login" },
+  events: {
+    // 로그아웃하면 강사님 서버의 토큰도 못 쓰게 해요. 실패해도 우리 로그아웃은 그대로 돼요
+    async signOut({ token }) {
+      if (!token?.springAccessToken) return;
+      await springFetch.post<null>(matchApiUrl.auth.logout, undefined, {
+        headers: { Authorization: `Bearer ${token.springAccessToken}` },
+      });
+    },
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -28,15 +40,23 @@ export const authOptions: NextAuthOptions = {
         const data = result.data;
 
         // 🔀 Spring 회원을 팀 Mongo User에도 둔다 (있으면 그대로, 없으면 만들기)
-        const mongoUser = await prisma.user.upsert({
-          where: { email: data.email },
-          update: {},
-          create: {
-            email: data.email,
-            name: data.name || data.email,
-            loginId: await makeLoginId(data.email),
-          },
-          select: { id: true },
+        const upsertUser = async () =>
+          prisma.user.upsert({
+            where: { email: data.email },
+            update: {},
+            create: {
+              email: data.email,
+              name: data.name || data.email,
+              loginId: await makeLoginId(data.email),
+            },
+            select: { id: true },
+          });
+        // 같은 사람이 동시에 처음 로그인하면 한쪽이 P2002(이미 있음)로 실패해요 → 한 번 더
+        const mongoUser = await upsertUser().catch((error: unknown) => {
+          if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            return upsertUser();
+          }
+          throw error;
         });
 
         return {

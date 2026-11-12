@@ -29,8 +29,62 @@
   border-bottom: 1px solid var(--line);
 }
 .brand {
-  font-size: 22px;
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.brand-icon {
+  position: relative;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 14px;
+  background: linear-gradient(140deg, #4938d1, #8554e8);
+  box-shadow: 0 5px 12px rgb(73 56 209 / 22%);
+  color: #fff;
+  transition: transform 160ms ease;
+}
+.brand-bubble {
+  width: 23px;
+  height: 23px;
+  stroke-width: 2;
+}
+.brand-sparkle {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 11px;
+  height: 11px;
+  fill: #fff;
+  stroke-width: 1.5;
+}
+.brand-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  color: #28243a;
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.brand-title strong {
+  background: linear-gradient(110deg, #4938d1, #8554e8);
+  background-clip: text;
+  color: transparent;
+  font-weight: 850;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand:hover .brand-title {
+  opacity: 0.86;
+}
+.brand:hover .brand-icon {
+  transform: translateY(-1px);
 }
 .board-header nav {
   display: flex;
@@ -401,8 +455,13 @@
     gap: 10px;
     flex-wrap: wrap;
   }
-  .brand {
-    font-size: 18px;
+  .brand-title {
+    font-size: 19px;
+  }
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
   }
   .board-header nav {
     gap: 8px;

@@ -11,6 +11,7 @@ export default function BoardList() {
   const [category, setCategory] = useState("전체");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("최신순");
+  const listCategories = categories.filter((c) => c !== "모델 비교");
   const filtered = filterPosts(posts, category, query, sort, days);
   const trending = filterPosts(posts, "전체", "", "좋아요순", days).slice(0, 3);
   const pages = Math.max(1, Math.ceil(filtered.length / 8));
@@ -55,7 +56,7 @@ export default function BoardList() {
         ))}
       </div>
       <div className="category-tabs">
-        {["전체", ...categories].map((c) => (
+        {["전체", ...listCategories].map((c) => (
           <button
             aria-pressed={category === c}
             className={category === c ? "selected" : ""}
