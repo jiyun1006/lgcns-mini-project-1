@@ -55,7 +55,7 @@
 - 채팅·게시판·마이페이지는 **우리 MongoDB의 `User` 번호(ObjectId)**로 "누가 썼나"를 기록한다. 강사님 서버의 숫자 `userId`는 로그인 안에서만 쓴다. (팀 합의: `user.id` = Mongo ObjectId)
 - "지금 로그인한 사람"은 공용 함수 `lib/current-user.ts`의 `getCurrentUser()`가 정한다. **`part/auth`에서는 아직 DB 첫 번째 사용자를 돌려준다.** 그래서 비로그인으로도 채팅·마이페이지가 "첫 사용자"로 동작한다. 마이페이지에서 저장하면 그 첫 사용자의 데이터가 바뀌니 테스트할 때 주의한다.
 - `getCurrentUser()`를 쓰는 곳은 9군데(채팅 API 5, 마이페이지 4)다. 세션 기반으로 바꾸면 로그인 안 했을 때 `null`이 되므로, 쓰는 곳 전부에 `null` 처리를 **한 PR로** 같이 넣는다.
-- 게시판은 `getCurrentUser()` 대신 `lib/board/server-user.ts`의 `BOARD_DEMO_USER_ID`를 쓴다. 로그인을 붙일 때 같이 바꾼다.
+- 게시판 API는 NextAuth 세션의 MongoDB 사용자 ID로 `User`를 조회해 현재 작성자를 정한다. 로그인하지 않았거나 해당 사용자가 DB에 없으면 401을 반환한다.
 - 프로젝트에 Cache Components가 켜져 있어서, 쿠키·세션을 읽는 곳은 `<Suspense>` 안에 두고 요청마다 새로 조회한다.
 
 ## 3. API는 어떻게 보내고 있나
