@@ -23,5 +23,6 @@ export const realAuthApi: AuthApi = {
   // ⏸ 회원가입 쪽은 3장에서 바꿔요. 그때까지 가짜를 그대로 써요
   checkEmail: mockAuthApi.checkEmail,
   checkNickname: mockAuthApi.checkNickname,
+  checkLoginId: mockAuthApi.checkLoginId,
   signup: mockAuthApi.signup,
 };
