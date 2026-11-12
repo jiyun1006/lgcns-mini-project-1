@@ -12,6 +12,7 @@ export interface BoardPost {
   tags: string[];
   author: string;
   authorId?: string;
+  authorProfileImageUrl?: string | null;
   createdAt: string;
   viewCount: number;
   likeCount: number;

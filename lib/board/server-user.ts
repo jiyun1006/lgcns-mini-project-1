@@ -1,28 +1,17 @@
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/current-user";
 import { BoardError } from "./validation";
 
 export async function boardUser() {
-  if (process.env.NODE_ENV === "production") {
-    throw new BoardError("게시판 세션 인증을 연결한 후 배포해 주세요.", 401);
+  try {
+    const user = await getCurrentUser();
+    return { id: user.id, name: user.name };
+  } catch (error) {
+    if (error instanceof Error && error.message === "로그인이 필요합니다.") {
+      throw new BoardError(
+        "로그인이 필요합니다. 개발 환경에서는 BOARD_DEMO_USER_ID를 확인해 주세요.",
+        401,
+      );
+    }
+    throw error;
   }
-
-  const id = process.env.BOARD_DEMO_USER_ID;
-
-  if (!id || !/^[a-f0-9]{24}$/i.test(id)) {
-    throw new BoardError(".env.local에 BOARD_DEMO_USER_ID를 설정해 주세요.", 401);
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
-
-  if (!user) {
-    throw new BoardError("테스트 사용자가 DB에 없습니다. BOARD_DEMO_USER_ID를 확인해 주세요.", 401);
-  }
-
-  return user;
 }
