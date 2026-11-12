@@ -42,7 +42,7 @@ export default function ChatSidebar({
           marginBottom: "24px",
         }}
       >
-        <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>EXAONE Chat</h2>
+        <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>Chat EXAONE</h2>
 
         <button
           type="button"

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { MessageCircle, Sparkles } from "lucide-react";
 import LoginStatus from "@/components/auth/atoms/LoginStatus";
 import { useAuth } from "@/components/auth/providers/AuthProvider";
 
@@ -16,8 +17,14 @@ export default function BoardHeader() {
   return (
     <div className="board-shell" style={{ minHeight: "auto" }}>
       <header className="board-header">
-        <Link href="/posts" className="brand">
-          [서비스명]
+        <Link href="/posts" className="brand" aria-label="Chat EXAONE 홈">
+          <span className="brand-icon" aria-hidden="true">
+            <MessageCircle className="brand-bubble" />
+            <Sparkles className="brand-sparkle" />
+          </span>
+          <span className="brand-title">
+            Chat <strong>EXAONE</strong>
+          </span>
         </Link>
         <nav aria-label="주 메뉴">
           <Link href="/posts" aria-current={isCommunity ? "page" : undefined}>

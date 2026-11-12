@@ -1,7 +1,7 @@
-# 미니프로젝트1
+# Chat EXAONE
 
 > LG CNS AM Inspire Camp 7기 미니프로젝트 (8명 · 4일)
-> **K-EXAONE 2.5를 활용한 AI 채팅 서비스**
+> **EXAONE과 대화하고 AI 프롬프트를 함께 나누는 커뮤니티**
 
 ## 기술 스택
 

@@ -99,6 +99,10 @@ function Editor({
       router.push(`/posts/${id}`);
     }
   }
+  const formCategories = post
+    ? categories
+    : categories.filter((category) => category !== "모델 비교");
+
   return (
     <main className="board-main narrow">
       <h1>{post ? "게시글 수정" : "새 게시글 작성"}</h1>
@@ -107,7 +111,7 @@ function Editor({
           <label>
             카테고리
             <select name="category" defaultValue={post?.category ?? categories[0]}>
-              {categories.map((c) => (
+              {formCategories.map((c) => (
                 <option key={c}>{c}</option>
               ))}
             </select>
