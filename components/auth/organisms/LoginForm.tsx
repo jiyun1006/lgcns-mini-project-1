@@ -6,7 +6,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import Alert from "@/components/auth/atoms/Alert";
 import Button from "@/components/auth/atoms/Button";
 import PasswordField from "@/components/auth/molecules/PasswordField";
-import SocialLoginButtons from "@/components/auth/molecules/SocialLoginButtons";
+// import SocialLoginButtons from "@/components/auth/molecules/SocialLoginButtons";
 import TextField from "@/components/auth/molecules/TextField";
 import { forgetEmail, rememberEmail } from "@/lib/savedEmail";
 import { authApi } from "@/service/auth/authApi";
@@ -125,7 +125,7 @@ export default function LoginForm({ initialEmail }: { initialEmail: string }) {
         로그인
       </Button>
 
-      <SocialLoginButtons />
+      {/* <SocialLoginButtons /> */}
 
       <p className="text-center text-[14px] text-[#52525B]">
         아직 회원이 아니신가요?{" "}
