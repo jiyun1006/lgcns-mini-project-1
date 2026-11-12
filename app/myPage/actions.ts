@@ -65,6 +65,7 @@ export async function updateProfile(
   if (Object.keys(errors).length) return { errors };
 
   const user = await getCurrentUser();
+  if (!user) return { errors: { nickname: "로그인이 필요해요." } };
 
   // shortcut: loginId에 unique 인덱스가 없어 동시 저장 시 중복될 수 있음, 백필 후 @unique로 바꾸면 P2002로 처리
   const taken = await prisma.user.findFirst({
@@ -103,6 +104,8 @@ export async function updateIntro(
   if (errors.bio || errors.interests) return { errors };
 
   const user = await getCurrentUser();
+  if (!user) return { errors: { bio: "로그인이 필요해요." } };
+
   await prisma.user.update({
     where: { id: user.id },
     data: { bio: bio || null, interests },
@@ -118,6 +121,8 @@ export async function updatePrivacy(
   formData: FormData,
 ): Promise<PrivacyFormState> {
   const user = await getCurrentUser();
+  if (!user) return { ok: false };
+
   await prisma.user.update({
     where: { id: user.id },
     data: {
