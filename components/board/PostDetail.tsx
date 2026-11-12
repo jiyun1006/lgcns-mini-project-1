@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useBoard } from "./BoardProvider";
 import Comments from "./Comments";
@@ -105,6 +106,21 @@ export default function PostDetail({ postId }: { postId: string }) {
               <h2>공유된 프롬프트</h2>
               <div className="actions">
                 <button onClick={copy}>복사</button>
+                {post.prompt.trim() && (
+                  <button
+                    className="primary use-prompt-button"
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        prompt: post.prompt,
+                        request: crypto.randomUUID(),
+                      });
+                      router.push(`/chatting?${params.toString()}`);
+                    }}
+                  >
+                    <MessageSquare size={16} aria-hidden="true" />
+                    프롬프트 사용하기
+                  </button>
+                )}
               </div>
             </div>
             <pre>{post.prompt}</pre>
