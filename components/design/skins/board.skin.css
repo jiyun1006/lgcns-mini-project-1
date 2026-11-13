@@ -1,0 +1,367 @@
+/*
+ * 게시판 덧씌우기: app/posts/board.css의 클래스는 그대로 두고 모양만 새 디자인으로 바꾼다.
+ * - app/layout.tsx에서 board.css 다음에 불러와야 덮어쓴다.
+ * - 게시판 컴포넌트(BoardList · PostDetail · PostForm · Comments)의 JSX는 건드리지 않는다.
+ */
+
+/* 바탕 · 글꼴 */
+.board-shell {
+  min-height: 0;
+  flex: 1;
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  font-family: var(--ds-font);
+  font-size: 15px;
+}
+.board-main {
+  max-width: 1160px;
+  padding: 40px 32px 96px;
+}
+.board-main.narrow {
+  max-width: 780px;
+}
+/* 게시글 불러오는 중 (BoardProvider · app/posts/loading.tsx): 가운데에 연한 글자만, 움직임 없음 */
+.board-main[role="status"] {
+  display: grid;
+  min-height: 60vh;
+  place-items: center;
+  color: var(--ds-ink-3);
+  font-size: 14px;
+  font-weight: 500;
+}
+.board-shell h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.3;
+}
+.board-shell h3 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.muted,
+.post-meta,
+.post-stats {
+  color: var(--ds-ink-2);
+}
+
+/* 버튼 */
+.board-shell button,
+.board-shell .button {
+  border-color: var(--ds-line-2);
+  border-radius: var(--ds-radius);
+  font-weight: 600;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+/* 마우스를 올리면 연한 회색 (보라 버튼 · 선택된 칩 · 눌린 좋아요 · 지금 페이지는 제외) */
+.board-shell
+  button:not(.primary, .selected, [aria-pressed="true"], [aria-current="page"]):hover:not(
+    :disabled
+  ),
+.board-shell .button:not(.primary):hover {
+  background: var(--ds-surface-2);
+}
+.board-shell .sort-tabs button:not(.selected):hover:not(:disabled) {
+  background: transparent;
+  color: var(--ds-ink);
+}
+.board-shell .primary {
+  border-color: var(--ds-primary);
+  background: var(--ds-primary);
+}
+.board-shell .primary:hover:not(:disabled) {
+  background: var(--ds-primary-strong);
+}
+.board-shell :focus-visible {
+  outline-color: var(--ds-primary);
+}
+
+/* 입력 칸 */
+.board-shell input,
+.board-shell textarea,
+.board-shell select {
+  border-color: var(--ds-line-2);
+  border-radius: var(--ds-radius);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.board-shell input:focus,
+.board-shell textarea:focus,
+.board-shell select:focus {
+  border-color: var(--ds-primary);
+  outline: 0;
+  box-shadow: 0 0 0 4px var(--ds-primary-soft);
+}
+
+/* 인기글 카드 */
+.trending-grid {
+  gap: 16px;
+}
+.trending-card {
+  border-color: var(--ds-line);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-1);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.trending-card:hover {
+  border-color: var(--ds-line-2);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-2);
+}
+.rank {
+  color: var(--ds-ink-3);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.trending-card:first-child .rank {
+  color: var(--ds-primary);
+}
+
+/* 카테고리 배지: '프롬프트 공유'만 진한 보라 (data-category는 BoardList · PostDetail에서 붙임) */
+.badge {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--ds-surface-2);
+  color: var(--ds-ink-2);
+}
+.badge[data-category="프롬프트 공유"] {
+  background: var(--ds-primary);
+  color: #fff;
+}
+
+/* 카테고리 칩 · 정렬 */
+.category-tabs button {
+  height: 36px;
+  padding: 0 15px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.category-tabs button.selected {
+  border-color: var(--ds-primary-line);
+  background: var(--ds-primary-soft);
+  color: var(--ds-primary);
+  font-weight: 700;
+}
+.sort-tabs {
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-3);
+}
+.sort-tabs button {
+  border-radius: 8px;
+  color: var(--ds-ink-2);
+  font-weight: 500;
+}
+.sort-tabs .selected {
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgb(23 21 31 / 0.08);
+}
+
+/* 기간 고르기: 시안의 선택 칸 (높이 40 · 글자 14 · 얇은 화살표)
+   board.css의 글쓰기 폼용 규칙(label 아래 여백, label 안 select 위 여백 10px)이 여기엔 안 걸리게 덮는다 */
+.board-shell .period {
+  margin: 0;
+  color: var(--ds-ink-2);
+  font-size: 14px;
+}
+.board-shell .period select {
+  height: 40px;
+  margin-top: 0;
+  padding: 0 34px 0 12px;
+  border-color: var(--ds-line-2);
+  border-radius: var(--ds-radius);
+  background: var(--ds-surface)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%235e5b6b' stroke-width='2' stroke-linecap='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 11px center;
+  color: var(--ds-ink);
+  font-size: 14px;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* 글 목록 */
+.post-list {
+  border-color: var(--ds-line);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-1);
+}
+.list-summary {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--ds-line);
+  background: transparent;
+  color: var(--ds-ink-3);
+}
+.post-row {
+  padding: 20px 24px;
+  border-top-color: var(--ds-line);
+  transition: background 0.15s;
+}
+.post-row:hover {
+  background: #fbfbfd;
+}
+.post-row h3 {
+  transition: color 0.15s;
+}
+.post-row:hover h3 {
+  color: var(--ds-primary);
+}
+.row-number {
+  color: var(--ds-ink-3);
+  font-size: 18px;
+  font-weight: 700;
+}
+.post-stats {
+  color: var(--ds-ink-3);
+}
+
+/* 해시태그: 회색 칸 */
+.tags span {
+  padding: 2px 9px;
+  border-radius: 6px;
+  background: var(--ds-surface-2);
+  color: var(--ds-ink-2);
+}
+
+/* 페이지 번호: 지금 페이지는 연보라 */
+.pagination [aria-current="page"] {
+  border-color: var(--ds-primary-line);
+  background: var(--ds-primary-soft);
+  color: var(--ds-primary);
+  font-weight: 700;
+}
+
+/* 글 상세 */
+.back-link {
+  color: var(--ds-ink-2) !important;
+}
+.back-link:hover {
+  color: var(--ds-primary) !important;
+}
+.prompt-panel {
+  border-color: var(--ds-primary-line);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-primary-soft);
+}
+.prompt-panel h2,
+.prompt-panel > label {
+  color: var(--ds-primary);
+}
+.prompt-panel pre {
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  color: var(--ds-primary-ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+.like-area button {
+  height: 44px;
+  padding: 0 20px;
+  font-weight: 700;
+}
+.like-area button[aria-pressed="true"] {
+  border-color: var(--ds-primary-line);
+  background: var(--ds-primary-soft);
+  color: var(--ds-primary);
+}
+.danger {
+  color: var(--ds-danger);
+}
+
+/* 댓글 */
+.comments {
+  border-top-color: var(--ds-line);
+}
+.reply {
+  border-color: var(--ds-line);
+}
+.board-shell .comment-reply-button {
+  color: var(--ds-ink-2);
+  font-weight: 500;
+}
+
+/* 글쓰기 */
+/* 카테고리 선택 칸: 기간 칸과 같은 얇은 화살표 (높이는 옆 제목 칸과 같게 그대로) */
+.board-shell .form-top select {
+  padding-right: 34px;
+  background: var(--ds-surface)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%235e5b6b' stroke-width='2' stroke-linecap='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 13px center;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* 태그 상자: 바깥 상자에만 테두리 · 누름 링, 안쪽 입력칸은 테두리 없이 */
+.tag-input {
+  min-height: 48px;
+  gap: 6px;
+  padding: 8px;
+  border-color: var(--ds-line-2);
+  border-radius: var(--ds-radius);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.tag-input:focus-within {
+  border-color: var(--ds-primary);
+  box-shadow: 0 0 0 4px var(--ds-primary-soft);
+}
+.board-shell .tag-input input,
+.board-shell .tag-input input:focus {
+  height: 30px;
+  padding: 0 6px;
+  border: 0;
+  outline: 0;
+  background: none;
+  box-shadow: none;
+}
+/* 태그 조각: 연보라 알약 (누르면 지워짐) */
+.board-shell .tag-input button,
+.board-shell .tag-input button:hover:not(:disabled) {
+  height: 30px;
+  padding: 0 12px;
+  border-color: transparent;
+  border-radius: 999px;
+  background: var(--ds-primary-soft);
+  color: var(--ds-primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+.board-shell .tag-input button:hover:not(:disabled) {
+  background: var(--ds-primary-line);
+}
+.form-actions {
+  border-top-color: var(--ds-line);
+}
+
+/* 휴대폰: 인기글은 옆으로 밀어서 넘기기 */
+@media (max-width: 760px) {
+  .board-main {
+    padding: 24px 16px 64px;
+  }
+  .trending-grid {
+    display: flex;
+    gap: 12px;
+    margin: 0 -16px 28px;
+    padding: 0 16px 4px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 16px;
+    scrollbar-width: none;
+  }
+  .trending-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .trending-card {
+    flex: none;
+    width: 80%;
+    scroll-snap-align: start;
+  }
+}

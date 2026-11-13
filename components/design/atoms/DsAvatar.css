@@ -1,0 +1,22 @@
+.ds-avatar {
+  width: var(--ds-avatar-size, 40px);
+  height: var(--ds-avatar-size, 40px);
+}
+
+.ds-avatar-fallback {
+  font-size: calc(var(--ds-avatar-size, 40px) * 0.38);
+  font-weight: 700;
+}
+
+.ds-avatar-tone1 {
+  background: var(--ds-avatar-1-bg);
+  color: var(--ds-avatar-1-fg);
+}
+.ds-avatar-tone2 {
+  background: var(--ds-avatar-2-bg);
+  color: var(--ds-avatar-2-fg);
+}
+.ds-avatar-tone3 {
+  background: var(--ds-avatar-3-bg);
+  color: var(--ds-avatar-3-fg);
+}

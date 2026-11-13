@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Search, UserRound } from "lucide-react";
+import { Search } from "lucide-react";
 import { buttonVariants } from "@/components/mypage/atoms/MyPageButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -94,20 +94,14 @@ async function PublicProfile({ params }: { params: PageProps<"/users/[loginId]">
 export default function UserProfilePage({ params }: PageProps<"/users/[loginId]">) {
   return (
     <main className="flex flex-1 flex-col">
-      <div className="flex-1 bg-[#f3f4f6] px-4 py-8 text-[#222]">
+      <div className="flex-1 bg-(--ds-bg) px-4 py-8 text-(--ds-ink)">
         <div className="mx-auto grid max-w-2xl gap-6">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">프로필</h1>
-            <div className="flex gap-2">
-              <Link href="/users" className={buttonVariants({ variant: "outline" })}>
-                <Search aria-hidden />
-                유저 검색
-              </Link>
-              <Link href="/myPage" className={buttonVariants({ variant: "outline" })}>
-                <UserRound aria-hidden />
-                마이페이지
-              </Link>
-            </div>
+            <Link href="/users" className={buttonVariants({ variant: "outline" })}>
+              <Search aria-hidden />
+              유저 검색
+            </Link>
           </div>
           <Suspense>
             <PublicProfile params={params} />

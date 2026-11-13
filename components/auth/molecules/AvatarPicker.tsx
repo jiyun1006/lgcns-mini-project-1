@@ -24,7 +24,7 @@ export default function AvatarPicker({ initial, previewUrl, onChange }: AvatarPi
       ) : (
         <span
           aria-hidden="true"
-          className="flex h-22 w-22 items-center justify-center rounded-full border-2 border-dashed border-[#A5B4FC] bg-[#E0E7FF] text-[30px] font-extrabold text-[#3730A3]"
+          className="flex h-22 w-22 items-center justify-center rounded-full border-2 border-dashed border-(--ds-primary-line) bg-(--ds-primary-soft) text-[30px] font-extrabold text-(--ds-primary-strong)"
         >
           {initial || "?"}
         </span>
