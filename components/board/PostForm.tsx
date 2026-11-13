@@ -61,7 +61,8 @@ function Editor({
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const data = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const data = new FormData(form);
     const pending = tagInput.trim().replace(/^#+/, "");
 
     const values: PostInput = {
@@ -96,6 +97,15 @@ function Editor({
 
     if (id) {
       setDirty(false);
+      if (!post) {
+        form.reset();
+        setTags([]);
+        setTagInput("");
+        setNotice("");
+        window.alert("등록되었습니다");
+        router.push("/posts");
+        return;
+      }
       router.push(`/posts/${id}`);
     }
   }
