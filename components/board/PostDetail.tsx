@@ -8,6 +8,7 @@ import { MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useBoard } from "./BoardProvider";
 import Comments from "./Comments";
+import CopyButton from "@/components/design/molecules/CopyButton";
 export default function PostDetail({ postId }: { postId: string }) {
   const { posts, user, mutate, notify, busy } = useBoard();
   const post = posts.find((p) => p.id === postId);
@@ -37,8 +38,10 @@ export default function PostDetail({ postId }: { postId: string }) {
     try {
       await navigator.clipboard.writeText(post!.prompt);
       notify("프롬프트를 복사했어요.");
+      return true;
     } catch {
       notify("복사할 수 없어요. 텍스트를 선택해 직접 복사해 주세요.");
+      return false;
     }
   }
 
@@ -48,7 +51,9 @@ export default function PostDetail({ postId }: { postId: string }) {
         ← 목록으로 돌아가기
       </Link>
       <article>
-        <span className="badge">{post.category}</span>
+        <span className="badge" data-category={post.category}>
+          {post.category}
+        </span>
         <h1>{post.title}</h1>
         <div className="section-heading">
           <div className="post-detail-meta muted">
@@ -105,7 +110,7 @@ export default function PostDetail({ postId }: { postId: string }) {
             <div className="section-heading">
               <h2>공유된 프롬프트</h2>
               <div className="actions">
-                <button onClick={copy}>복사</button>
+                <CopyButton onCopy={copy} />
                 {post.prompt.trim() && (
                   <button
                     className="primary use-prompt-button"

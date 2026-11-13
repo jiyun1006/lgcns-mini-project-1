@@ -5,6 +5,8 @@ import BoardProvider from "@/components/board/BoardProvider";
 import AuthShell from "@/components/auth/providers/AuthShell";
 import "./globals.css";
 import "./posts/board.css";
+import "@/components/design/tokens.css";
+import "@/components/design/skins/board.skin.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +27,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Suspense fallback={<div role="status">화면을 불러오는 중이에요…</div>}>
+        {/* 글꼴 SUIT: 내려받지 않고 CDN에서 불러온다 */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css"
+          precedence="default"
+        />
+        <Suspense
+          fallback={
+            <div role="status" className="ds-page-loading">
+              화면을 불러오는 중이에요…
+            </div>
+          }
+        >
           <AuthShell>
             <BoardProvider>{children}</BoardProvider>
           </AuthShell>

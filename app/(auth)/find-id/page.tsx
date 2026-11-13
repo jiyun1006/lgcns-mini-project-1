@@ -1,9 +1,10 @@
 import FindIdForm from "@/components/auth/organisms/FindIdForm";
+import AuthPage from "@/components/design/templates/AuthPage";
 
 export default function FindIdPage() {
   return (
-    <main className="flex flex-1 items-center justify-center bg-[#F7F7F8] px-5 py-12">
+    <AuthPage>
       <FindIdForm />
-    </main>
+    </AuthPage>
   );
 }

@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Form from "next/form";
 import Link from "next/link";
-import { Search, UserRound } from "lucide-react";
-import { buttonVariants, MyPageButton } from "@/components/mypage/atoms/MyPageButton";
+import { Search } from "lucide-react";
+import { MyPageButton } from "@/components/mypage/atoms/MyPageButton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -91,14 +91,10 @@ async function SearchResults({
 export default function UsersPage({ searchParams }: PageProps<"/users">) {
   return (
     <main className="flex flex-1 flex-col">
-      <div className="flex-1 bg-[#f3f4f6] px-4 py-8 text-[#222]">
+      <div className="flex-1 bg-(--ds-bg) px-4 py-8 text-(--ds-ink)">
         <div className="mx-auto grid max-w-2xl gap-6">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">유저 검색</h1>
-            <Link href="/myPage" className={buttonVariants({ variant: "outline" })}>
-              <UserRound aria-hidden />
-              마이페이지
-            </Link>
           </div>
           <Suspense>
             <SearchResults searchParams={searchParams} />

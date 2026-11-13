@@ -62,15 +62,15 @@ export default function TagInput({ id, tags, onChange }: TagInputProps) {
     <div className="flex flex-col gap-2">
       <label htmlFor={id} className="text-[14px] font-bold">
         관심사{" "}
-        <span className="font-normal text-[#52525B]">
+        <span className="font-normal text-(--ds-ink-2)">
           (선택) · 쉼표(,)나 Enter로 태그를 만들어요
         </span>
       </label>
-      <div className="flex min-h-12 flex-wrap items-center gap-1.5 rounded-[10px] border border-[#D4D4D8] bg-white px-2.5 py-2">
+      <div className="flex min-h-12 flex-wrap items-center gap-1.5 rounded-[10px] border border-(--ds-line-2) bg-white px-2.5 py-2">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-0.5 rounded-full bg-[#EEF2FF] py-1 pr-1 pl-3 text-[14px] font-semibold text-[#3730A3]"
+            className="inline-flex items-center gap-0.5 rounded-full bg-(--ds-primary-soft) py-1 pr-1 pl-3 text-[14px] font-semibold text-(--ds-primary-strong)"
           >
             #{tag}
             <button
@@ -93,11 +93,11 @@ export default function TagInput({ id, tags, onChange }: TagInputProps) {
         />
       </div>
       {tags.length === 0 ? (
-        <span className="text-[12px] text-[#52525B]">
+        <span className="text-[12px] text-(--ds-ink-2)">
           아직 고른 관심사가 없어요. 아래에서 골라도 돼요 (선택)
         </span>
       ) : (
-        <span className="text-[12px] text-[#52525B]">태그 {tags.length}개</span>
+        <span className="text-[12px] text-(--ds-ink-2)">태그 {tags.length}개</span>
       )}
       <div className="flex flex-wrap gap-1.5">
         {POPULAR_TAGS.map((tag) => {
@@ -108,7 +108,7 @@ export default function TagInput({ id, tags, onChange }: TagInputProps) {
               type="button"
               disabled={isAdded}
               onClick={() => addTags([tag])}
-              className="min-h-9 rounded-full border border-dashed border-[#A1A1AA] bg-white px-3 text-[13px] font-semibold text-[#3F3F46] disabled:border-solid disabled:border-[#E4E4E7] disabled:bg-[#F4F4F5] disabled:text-[#52525B]"
+              className="min-h-9 rounded-full border border-dashed border-(--ds-ink-3) bg-white px-3 text-[13px] font-semibold text-(--ds-ink-2) disabled:border-solid disabled:border-(--ds-line) disabled:bg-(--ds-surface-2) disabled:text-(--ds-ink-2)"
             >
               {isAdded ? `✓ #${tag}` : `#${tag}`}
             </button>

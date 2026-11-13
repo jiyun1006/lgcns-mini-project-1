@@ -1,0 +1,28 @@
+/* 기본 모양은 게시판 버튼(.board-shell button)을 그대로 쓰고, 아이콘 간격과 '복사됨' 상태만 더한다 */
+.ds-copy {
+  gap: 6px;
+}
+.ds-copy-icon,
+.ds-copy-check {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.75;
+}
+
+/* 복사됨: 초록 칸 + 체크가 그려지듯 나타남. 게시판 버튼 규칙보다 우선하도록 선택자를 겹쳐 씀 */
+.ds-copy.ds-copy[data-copied],
+.ds-copy.ds-copy[data-copied]:hover:not(:disabled) {
+  border-color: #bfe6d3;
+  background: #effaf4;
+  color: var(--ds-ok);
+}
+.ds-copy-check path {
+  animation: ds-draw 0.35s var(--ds-ease) forwards;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+}
+@keyframes ds-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}

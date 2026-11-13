@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
+import { CircleAlert, Info } from "lucide-react";
 
 type AlertTone = "error" | "info";
 
 const toneClass: Record<AlertTone, string> = {
-  error: "border-[#FCA5A5] bg-[#FEF2F2] text-[#7F1D1D]",
-  info: "border-[#C7D2FE] bg-[#EEF2FF] text-[#312E81]",
+  error: "border-transparent bg-[#FDECEE] text-[#9B1C2E]",
+  info: "border-(--ds-primary-line) bg-(--ds-primary-soft) text-(--ds-primary-ink)",
 };
 
 export default function Alert({
@@ -17,9 +18,14 @@ export default function Alert({
   return (
     <div
       role={tone === "error" ? "alert" : "status"}
-      className={`rounded-[10px] border px-3.5 py-3 text-[14px] ${toneClass[tone]}`}
+      className={`flex items-start gap-2 rounded-[10px] border px-3.5 py-3 text-[14px] leading-[1.6] ${toneClass[tone]}`}
     >
-      {children}
+      {tone === "error" ? (
+        <CircleAlert size={16} className="mt-0.75 shrink-0" aria-hidden="true" />
+      ) : (
+        <Info size={16} className="mt-0.75 shrink-0" aria-hidden="true" />
+      )}
+      <span>{children}</span>
     </div>
   );
 }

@@ -1,0 +1,165 @@
+/* 위에 붙는 헤더. 유리 효과(뒤가 살짝 비침)는 사이트 전체에서 여기 한 곳에만 쓴다 */
+.ds-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  height: 72px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 40px;
+  padding: 0 32px;
+  font-family: var(--ds-font);
+}
+.ds-header::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-bottom: 1px solid rgb(235 234 240 / 0.9);
+  background: rgb(255 255 255 / 0.8);
+  content: "";
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+}
+
+/* 팀 로고는 원래 Arial로 그려졌으므로 글꼴만 그대로 물려준다 (로고 모양은 손대지 않음) */
+.ds-header-brand-slot {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  font-family: Arial, "Malgun Gothic", sans-serif;
+}
+
+/* 밑줄 탭 */
+.ds-header-nav {
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  gap: 6px;
+}
+.ds-header-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  color: var(--ds-ink-2);
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.ds-header-nav a:hover {
+  color: var(--ds-ink);
+}
+.ds-header-nav a:focus-visible {
+  outline: 2px solid var(--ds-primary);
+  outline-offset: -6px;
+  border-radius: 10px;
+}
+.ds-header-nav a[aria-current="page"] {
+  color: var(--ds-ink);
+  font-weight: 700;
+}
+.ds-header-nav a[aria-current="page"]::after {
+  position: absolute;
+  right: 12px;
+  bottom: -1px;
+  left: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ds-primary);
+  content: "";
+}
+
+.ds-header-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 글쓰기: 평소엔 흰 버튼, 마우스를 올리거나 누를 때만 보라 (눈이 로고로 먼저 가게) */
+.ds-header-write {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 11px;
+  border: 1px solid var(--ds-line-2);
+  border-radius: 9px;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.ds-header-write svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.75;
+}
+.ds-header-write:hover,
+.ds-header-write:active,
+.ds-header-write:focus-visible {
+  border-color: var(--ds-primary);
+  background: var(--ds-primary);
+  color: #fff;
+}
+.ds-header-write:focus-visible {
+  outline: 2px solid var(--ds-primary);
+  outline-offset: 2px;
+}
+
+/* 로그인 전: components/auth/atoms/LoginStatus.tsx의 버튼을 같은 크기의 흰 버튼으로 */
+.ds-header-login button {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--ds-line-2);
+  border-radius: 9px;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.ds-header-login button:hover {
+  background: var(--ds-surface-2);
+}
+
+/* 휴대폰: 1줄 로고 + 오른쪽 버튼, 2줄 탭 (탭은 반반) */
+@media (max-width: 640px) {
+  .ds-header {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0 16px;
+  }
+  .ds-header-brand-slot {
+    height: 60px;
+    flex: 1;
+  }
+  .ds-header-nav {
+    height: 44px;
+    flex-basis: 100%;
+    order: 3;
+    gap: 0;
+  }
+  .ds-header-nav a {
+    flex: 1;
+    justify-content: center;
+  }
+  .ds-header-nav a[aria-current="page"]::after {
+    right: 22%;
+    left: 22%;
+  }
+  .ds-header-write {
+    width: 32px;
+    padding: 0;
+  }
+  .ds-header-write-text {
+    display: none;
+  }
+}

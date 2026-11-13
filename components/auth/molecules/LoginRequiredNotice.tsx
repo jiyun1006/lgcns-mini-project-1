@@ -23,14 +23,14 @@ export default function LoginRequiredNotice({ message }: { message: string }) {
         justifyContent: "space-between",
         gap: "12px",
         padding: "14px 18px",
-        border: "1px solid #e5e7eb",
+        border: "1px solid var(--ds-line)",
         borderRadius: "16px",
-        background: "#f9fafb",
+        background: "var(--ds-bg)",
       }}
     >
       <div>
         <p style={{ margin: 0, fontWeight: 600 }}>로그인이 필요해요</p>
-        <p style={{ margin: "4px 0 0", fontSize: "14px", color: "#6b7280" }}>{message}</p>
+        <p style={{ margin: "4px 0 0", fontSize: "14px", color: "var(--ds-ink-2)" }}>{message}</p>
       </div>
       <button
         type="button"
@@ -39,10 +39,10 @@ export default function LoginRequiredNotice({ message }: { message: string }) {
         style={{
           flexShrink: 0,
           padding: "12px 18px",
-          background: "#222",
+          background: "var(--ds-primary)",
           color: "white",
           border: "none",
-          borderRadius: "8px",
+          borderRadius: "10px",
           cursor: isPending ? "not-allowed" : "pointer",
           opacity: isPending ? 0.6 : 1,
         }}

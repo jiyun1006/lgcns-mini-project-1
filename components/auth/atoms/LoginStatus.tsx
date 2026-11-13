@@ -5,7 +5,7 @@ import { signOut } from "next-auth/react";
 import { rememberReturnPath } from "@/actions/returnToActions";
 import { useAuth } from "@/components/auth/providers/AuthProvider";
 
-const buttonClassName = "shrink-0 text-sm font-semibold text-[#52525B] disabled:opacity-50";
+const buttonClassName = "shrink-0 text-sm font-semibold text-(--ds-ink-2) disabled:opacity-50";
 
 export default function LoginStatus() {
   const { isLoggedIn } = useAuth();

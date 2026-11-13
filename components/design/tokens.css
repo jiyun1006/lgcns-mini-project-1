@@ -1,0 +1,91 @@
+/*
+ * 디자인 토큰: 색 · 글꼴 · 모서리 · 그림자 · 움직임 값을 한곳에 모은 파일
+ * - app/layout.tsx에서 globals.css 다음에 한 번만 불러온다.
+ * - 이름은 모두 --ds- 로 시작한다 (shadcn의 --primary 같은 이름과 섞이지 않게).
+ * - 값의 근거와 쓰는 곳은 루트의 DESIGN.md에 있다.
+ */
+:root {
+  --ds-font:
+    "SUIT Variable", "SUIT", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Malgun Gothic", sans-serif;
+
+  /* 바탕과 글자 */
+  --ds-bg: #f7f7f9;
+  --ds-surface: #ffffff;
+  --ds-surface-2: #f3f2f7;
+  --ds-surface-3: #ebeaf1;
+  --ds-ink: #17151f;
+  --ds-ink-2: #5e5b6b;
+  --ds-ink-3: #6b6880;
+  --ds-line: #ebeaf0;
+  --ds-line-2: #dedce6;
+
+  /* 브랜드 보라: 로고 · 지금 위치 · 주 버튼 · 프롬프트에만 */
+  --ds-primary: #4938d1;
+  --ds-primary-strong: #3b2bb8;
+  --ds-primary-soft: #f1effd;
+  --ds-primary-line: #dcd7fb;
+  --ds-primary-ink: #2d2275;
+
+  /* 상태 */
+  --ds-ok: #14794f;
+  --ds-danger: #c0263a;
+
+  /* 사진 동그라미: 팀이 정한 세 가지 색 (develop의 댓글 색과 같음) */
+  --ds-avatar-1-bg: #d7f7e6;
+  --ds-avatar-1-fg: #236b43;
+  --ds-avatar-2-bg: #f8d9ed;
+  --ds-avatar-2-fg: #8e3769;
+  --ds-avatar-3-bg: #e2e4ff;
+  --ds-avatar-3-fg: #4636b2;
+
+  /* 모양 */
+  --ds-radius: 10px;
+  --ds-radius-md: 12px;
+  --ds-radius-lg: 16px;
+  --ds-shadow-1: 0 1px 2px rgb(23 21 31 / 0.05);
+  --ds-shadow-2: 0 1px 2px rgb(23 21 31 / 0.04), 0 8px 24px rgb(23 21 31 / 0.06);
+  --ds-shadow-3: 0 4px 10px rgb(23 21 31 / 0.06), 0 22px 52px rgb(23 21 31 / 0.16);
+  --ds-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+body {
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  font-family: var(--ds-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+::selection {
+  background: var(--ds-primary-line);
+  color: var(--ds-ink);
+}
+
+input,
+textarea {
+  caret-color: var(--ds-primary);
+}
+
+/* 화면 전체 로딩 안내 (app/layout.tsx의 Suspense): 가운데에 연한 글자만, 움직임 없음
+   게시판 로딩(board.skin.css의 .board-main[role="status"])과 같은 자리에 오도록 위아래 여백을 맞춤 */
+.ds-page-loading {
+  display: grid;
+  min-height: 60vh;
+  place-items: center;
+  padding: 40px 0 96px;
+  color: var(--ds-ink-3);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 기기에서 '움직임 줄이기'를 켠 사람에게는 모든 움직임을 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

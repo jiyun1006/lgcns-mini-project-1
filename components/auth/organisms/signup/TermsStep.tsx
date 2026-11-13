@@ -18,12 +18,12 @@ export default function TermsStep({ terms, onChange, showError }: TermsStepProps
   return (
     <fieldset className="flex flex-col gap-3.5">
       <legend className="mb-3.5 text-[19px] font-bold">약관에 동의해 주세요</legend>
-      <label className="flex cursor-pointer items-center gap-2.5 rounded-[10px] bg-[#F4F4F5] p-3.5 text-[15px] font-bold">
+      <label className="flex cursor-pointer items-center gap-2.5 rounded-[10px] bg-(--ds-surface-2) p-3.5 text-[15px] font-bold has-checked:bg-(--ds-primary-soft) max-sm:bg-(--ds-surface) max-sm:has-checked:bg-(--ds-primary-soft)">
         <input
           type="checkbox"
           checked={isAllAgreed}
           onChange={() => onChange(terms.map(() => !isAllAgreed))}
-          className="h-5 w-5 accent-[#4338CA]"
+          className="h-5 w-5 accent-(--ds-primary)"
         />
         전체 동의
       </label>
@@ -36,19 +36,22 @@ export default function TermsStep({ terms, onChange, showError }: TermsStepProps
             type="checkbox"
             checked={terms[index]}
             onChange={() => onChange(terms.map((value, i) => (i === index ? !value : value)))}
-            className="h-4.5 w-4.5 accent-[#4338CA]"
+            className="h-4.5 w-4.5 accent-(--ds-primary)"
           />
-          <span className={`font-bold ${term.required ? "text-[#3730A3]" : "text-[#52525B]"}`}>
+          <span
+            className={`font-bold ${term.required ? "text-(--ds-primary-strong)" : "text-(--ds-ink-2)"}`}
+          >
             {term.required ? "(필수)" : "(선택)"}
           </span>
           {term.label}
         </label>
       ))}
-      {showError && !isRequiredAgreed ? (
-        <p role="alert" className="text-[13px] font-semibold text-[#B91C1C]">
-          필수 약관에 모두 동의해 주세요.
-        </p>
-      ) : null}
+      <p
+        role="alert"
+        className="min-h-5 px-3.5 text-[13px] leading-5 font-semibold text-(--ds-danger)"
+      >
+        {showError && !isRequiredAgreed ? "필수 약관에 모두 동의해 주세요." : ""}
+      </p>
     </fieldset>
   );
 }

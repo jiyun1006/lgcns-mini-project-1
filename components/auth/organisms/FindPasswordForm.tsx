@@ -11,6 +11,7 @@ import PasswordField from "@/components/auth/molecules/PasswordField";
 import PasswordStrength from "@/components/auth/molecules/PasswordStrength";
 import TextField from "@/components/auth/molecules/TextField";
 import { validatePassword, validatePasswordConfirm } from "@/lib/validation/auth";
+import "@/components/design/skins/auth.css";
 
 type Step = "email" | "reset" | "done";
 
@@ -64,19 +65,20 @@ export default function FindPasswordForm() {
     });
   };
 
-  const cardClass =
-    "flex w-full max-w-105 flex-col gap-4.5 rounded-2xl border border-[#E4E4E7] bg-white px-8 py-9";
+  const cardClass = "ds-auth-card ds-auth-tall";
 
   if (step === "done") {
     return (
-      <div className={cardClass}>
-        <h1 className="text-center text-[26px] font-extrabold">비밀번호를 바꿨어요</h1>
-        <p className="text-center text-[14px] text-[#52525B]">
+      <div className={`${cardClass} ds-auth-center`}>
+        <h1 className="text-center text-[26px] font-extrabold max-sm:text-left">
+          비밀번호를 바꿨어요
+        </h1>
+        <p className="text-center text-[14px] text-(--ds-ink-2) max-sm:text-left">
           새 비밀번호로 다시 로그인해 주세요.
         </p>
         <a
           href="/login"
-          className="rounded-[10px] bg-[#4338CA] py-3.5 text-center text-[16px] font-bold text-white"
+          className="rounded-[10px] bg-(--ds-primary) py-3.5 text-center text-[16px] font-bold text-white hover:bg-(--ds-primary-strong)"
         >
           로그인하러 가기
         </a>
@@ -90,16 +92,15 @@ export default function FindPasswordForm() {
       noValidate
       className={cardClass}
     >
-      <header className="flex flex-col gap-1.5 text-center">
+      <header className="ds-auth-head">
         <h1 className="text-[26px] font-extrabold">비밀번호 찾기</h1>
-        <p className="text-[14px] text-[#52525B]">
+        <p className="text-[14px] text-(--ds-ink-2)">
           {step === "email"
             ? "가입할 때 쓴 이메일로 보안키를 보내 드려요"
             : "메일로 받은 보안키와 새 비밀번호를 넣어 주세요"}
         </p>
       </header>
 
-      {error ? <Alert>{error}</Alert> : null}
       {info && step === "reset" ? <Alert tone="info">{info}</Alert> : null}
 
       {step === "email" ? (
@@ -112,11 +113,13 @@ export default function FindPasswordForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onClear={() => setEmail("")}
+          tone={error ? "error" : "default"}
+          message={error}
         />
       ) : (
         <>
-          <p className="text-[14px] text-[#52525B]">
-            이메일 <b className="text-[#18181B]">{email}</b>
+          <p className="text-[14px] text-(--ds-ink-2)">
+            이메일 <b className="text-(--ds-ink)">{email}</b>
           </p>
           <TextField
             id="reset-token"
@@ -142,6 +145,8 @@ export default function FindPasswordForm() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             onClear={() => setConfirm("")}
+            tone={error ? "error" : "default"}
+            message={error}
           />
         </>
       )}
@@ -160,13 +165,13 @@ export default function FindPasswordForm() {
           type="button"
           onClick={requestKey}
           disabled={isPending}
-          className="text-[14px] text-[#4338CA] underline"
+          className="text-[14px] text-(--ds-primary) underline"
         >
           보안키 다시 받기
         </button>
       ) : null}
 
-      <p className="flex justify-center gap-1.5 text-[14px] text-[#52525B]">
+      <p className="ds-auth-foot flex justify-center gap-1.5 text-[14px] text-(--ds-ink-2)">
         <Link href="/login">로그인</Link>
         <span aria-hidden="true">|</span>
         <Link href="/find-id">아이디 찾기</Link>

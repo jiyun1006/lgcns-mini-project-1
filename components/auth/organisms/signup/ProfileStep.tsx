@@ -46,7 +46,7 @@ export default function ProfileStep({
           message={nicknameView.message}
         />
       </div>
-      <span className="-mt-2.5 text-[12px] text-[#52525B]">
+      <span className="-mt-2.5 text-[12px] text-(--ds-ink-2)">
         동그라미를 눌러 프로필 사진을 올려요 · 선택 사항
       </span>
       <TagInput
